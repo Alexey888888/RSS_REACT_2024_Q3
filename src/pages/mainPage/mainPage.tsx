@@ -5,9 +5,11 @@ import { ListView } from '../../components/listView/listView';
 export class MainPage extends Component {
   render() {
     return (
-      <div>
-        <SearchBar />
-        <ListView />
+      <div className="main-page">
+        <div className="container">
+          <SearchBar />
+          <ListView />
+        </div>
       </div>
     );
   }
