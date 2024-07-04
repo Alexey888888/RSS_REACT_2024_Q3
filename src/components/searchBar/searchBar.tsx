@@ -1,7 +1,9 @@
 import { ChangeEvent, Component } from 'react';
 import { Button } from '../button/button';
 import { Input } from '../input/input';
-import { ISearchBarState } from './IsearchBar';
+import { ISearchBarState } from './ISearchBar';
+
+import './searchBar.scss';
 
 export class SearchBar extends Component<object, ISearchBarState> {
   constructor(props: object) {
@@ -16,14 +18,16 @@ export class SearchBar extends Component<object, ISearchBarState> {
 
   render() {
     return (
-      <div>
-        <Input
-          type="text"
-          value={this.state.searchTerm}
-          placeholder="input search term"
-          onChange={this.handleInputChange}
-        />
-        <Button type="submit" text="Search" />
+      <div className="search-bar">
+        <form>
+          <Input
+            type="text"
+            value={this.state.searchTerm}
+            placeholder="input search term"
+            onChange={this.handleInputChange}
+          />
+          <Button type="submit" text="Search" />
+        </form>
       </div>
     );
   }

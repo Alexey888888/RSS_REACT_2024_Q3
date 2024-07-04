@@ -1,0 +1,10 @@
+.search-bar {
+  padding-top: 50px;
+  display: flex;
+  justify-content: center;
+
+  form {
+    display: flex;
+    column-gap: 20px;
+  }
+}
