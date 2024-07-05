@@ -22,11 +22,14 @@ export class MainPage extends Component<object, IMainPageState> {
   };
 
   render() {
+    const { bookList, errorMessage } = this.state;
+
     return (
       <div className="main-page">
         <div className="container">
           <SearchBar />
-          <ListView />
+          {errorMessage && <p>Error: {errorMessage}</p>}
+          <ListView bookList={bookList} />
         </div>
       </div>
     );
