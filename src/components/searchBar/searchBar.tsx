@@ -1,12 +1,12 @@
-import { ChangeEvent, Component } from 'react';
+import { ChangeEvent, Component, FormEvent } from 'react';
 import { Button } from '../button/button';
 import { Input } from '../input/input';
-import { ISearchBarState } from './ISearchBar';
+import { ISearchBarProps, ISearchBarState } from './ISearchBar';
 
 import './searchBar.scss';
 
-export class SearchBar extends Component<object, ISearchBarState> {
-  constructor(props: object) {
+export class SearchBar extends Component<ISearchBarProps, ISearchBarState> {
+  constructor(props: ISearchBarProps) {
     super(props);
     this.state = { searchTerm: '' };
   }
@@ -16,10 +16,15 @@ export class SearchBar extends Component<object, ISearchBarState> {
     this.setState({ searchTerm: newSearchTerm });
   };
 
+  onSubmit = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault();
+    this.props.handleSubmit(this.props.bookList, this.state.searchTerm);
+  };
+
   render() {
     return (
       <div className="search-bar">
-        <form>
+        <form onSubmit={this.onSubmit}>
           <Input
             type="text"
             value={this.state.searchTerm}
