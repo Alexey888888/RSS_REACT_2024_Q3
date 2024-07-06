@@ -18,7 +18,6 @@ export class MainPage extends Component<object, IMainPageState> {
     } else if (response.bookList) {
       this.setState({ bookList: response.bookList });
     }
-    console.log(this.state);
   };
 
   render() {

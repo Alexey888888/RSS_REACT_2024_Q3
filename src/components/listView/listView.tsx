@@ -1,5 +1,8 @@
 import { Component } from 'react';
 import { IListView } from './IListView';
+import { BookCard } from '../bookCard/bookCard';
+
+import './listView.scss';
 
 export class ListView extends Component<IListView> {
   constructor(props: IListView) {
@@ -11,10 +14,15 @@ export class ListView extends Component<IListView> {
 
     return (
       <div>
-        <h2>ListView component</h2>
-        <ul>
+        <ul className="book-list">
           {bookList.map((book) => (
-            <li key={book.uid}>{book.title}</li>
+            <li key={book.uid}>
+              <BookCard
+                title={book.title}
+                publishedYear={book.publishedYear}
+                numberOfPages={book.numberOfPages}
+              />
+            </li>
           ))}
         </ul>
       </div>
