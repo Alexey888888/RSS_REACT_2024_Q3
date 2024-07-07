@@ -3,13 +3,16 @@ import { SearchBar } from '../../components/searchBar/searchBar';
 import { ListView } from '../../components/listView/listView';
 import { IMainPageState } from './types';
 import { fetchBookList } from '../../controllers/fetchBookList';
-import { searchTerm } from '../../controllers/saerchTerm';
+import { searchTerm } from '../../controllers/searchTerm';
+import { Button } from '../../components/button/button';
+
+import './mainPage.scss';
 
 export class MainPage extends Component<object, IMainPageState> {
   constructor(props: object) {
     super(props);
 
-    this.state = { bookList: [], errorMessage: '', term: '', loading: false };
+    this.state = { bookList: [], errorMessage: '', term: '', loading: false, hasError: false };
   }
 
   componentDidMount = async () => {
@@ -58,14 +61,23 @@ export class MainPage extends Component<object, IMainPageState> {
     localStorage.setItem('searchTerm_888888', term);
   };
 
+  handleErrorButtonClick = () => {
+    this.setState({ hasError: true });
+  };
+
   render() {
+    if (this.state.hasError) throw new Error();
+
     const { bookList, errorMessage, loading } = this.state;
 
     return (
       <div className="main-page">
         <div className="container">
+          <div className="error-button">
+            <Button type="button" text="Error" onClick={this.handleErrorButtonClick}></Button>
+          </div>
           <SearchBar handleSubmit={this.handleSubmit} term={this.state.term} />
-          {loading && <p>Loading...</p>}
+          {loading && <p className="loading">Loading...</p>}
           {errorMessage && <p>Error: {errorMessage}</p>}
           {!loading && !errorMessage && <ListView bookList={bookList} />}
         </div>

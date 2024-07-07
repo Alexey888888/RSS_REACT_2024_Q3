@@ -31,4 +31,5 @@ export interface IMainPageState {
   errorMessage: string;
   term: string;
   loading: boolean;
+  hasError: boolean;
 }
