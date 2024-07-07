@@ -8,7 +8,7 @@ export const searchTerm = async (
   const apiUrl = 'https://stapi.co/api/v2/rest/book/search';
   const body = `pageNumber=${pageNumber}&pageSize=${pageSize}&title=${encodeURIComponent(term)}`;
 
-  const requestOptions: RequestInit = {
+  const requestOptions = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',

@@ -9,7 +9,7 @@ export class MainPage extends Component<object, IMainPageState> {
   constructor(props: object) {
     super(props);
 
-    this.state = { bookList: [], errorMessage: '', term: '' };
+    this.state = { bookList: [], errorMessage: '', term: '', loading: false };
   }
 
   componentDidMount = async () => {
@@ -17,6 +17,7 @@ export class MainPage extends Component<object, IMainPageState> {
   };
 
   getAllBooks = async () => {
+    this.setState({ loading: true });
     const pageNumber = 0;
     const pageSize = 50;
     const response = await fetchBookList(pageNumber, pageSize);
@@ -25,24 +26,28 @@ export class MainPage extends Component<object, IMainPageState> {
     } else if (response.bookList) {
       this.setState({ bookList: response.bookList });
     }
+    this.setState({ loading: false });
   };
 
   handleSubmit = async (term: string) => {
+    this.setState({ loading: true });
     const pageNumber = 0;
     const pageSize = 50;
     if (term) {
       const searchResult = await searchTerm(pageNumber, pageSize, term);
       if (searchResult.bookList) this.setState({ bookList: searchResult.bookList });
     } else this.getAllBooks();
+    this.setState({ loading: false });
   };
 
   render() {
-    const { bookList, errorMessage } = this.state;
+    const { bookList, errorMessage, loading } = this.state;
 
     return (
       <div className="main-page">
         <div className="container">
           <SearchBar handleSubmit={this.handleSubmit} term={this.state.term} />
+          {loading && <p>Loading...</p>}
           {errorMessage && <p>Error: {errorMessage}</p>}
           <ListView bookList={bookList} />
         </div>
