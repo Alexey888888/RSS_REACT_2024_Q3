@@ -13,7 +13,13 @@ export class MainPage extends Component<object, IMainPageState> {
   }
 
   componentDidMount = async () => {
-    this.getAllBooks();
+    const searchTerm = localStorage.getItem('searchTerm_888888');
+    if (!searchTerm) {
+      this.getAllBooks();
+    } else {
+      this.setState({ term: searchTerm });
+      this.handleSubmit(searchTerm);
+    }
   };
 
   getAllBooks = async () => {
@@ -48,6 +54,8 @@ export class MainPage extends Component<object, IMainPageState> {
     } finally {
       this.setState({ loading: false });
     }
+
+    localStorage.setItem('searchTerm_888888', term);
   };
 
   render() {

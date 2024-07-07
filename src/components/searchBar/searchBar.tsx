@@ -25,12 +25,7 @@ export class SearchBar extends Component<ISearchBarProps, ISearchBarState> {
     return (
       <div className="search-bar">
         <form onSubmit={this.onSubmit}>
-          <Input
-            type="text"
-            value={this.state.searchTerm}
-            placeholder="input search term"
-            onChange={this.handleInputChange}
-          />
+          <Input type="text" value={this.state.searchTerm} onChange={this.handleInputChange} />
           <Button type="submit" text="Search" />
         </form>
       </div>
