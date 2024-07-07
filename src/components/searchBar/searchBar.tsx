@@ -11,6 +11,13 @@ export class SearchBar extends Component<ISearchBarProps, ISearchBarState> {
     this.state = { searchTerm: '' };
   }
 
+  componentDidMount(): void {
+    const storedSearchTerm = localStorage.getItem('searchTerm_888888');
+    if (storedSearchTerm) {
+      this.setState({ searchTerm: storedSearchTerm });
+    }
+  }
+
   handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const newSearchTerm = event.target.value.trim();
     this.setState({ searchTerm: newSearchTerm });
