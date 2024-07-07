@@ -17,27 +17,37 @@ export class MainPage extends Component<object, IMainPageState> {
   };
 
   getAllBooks = async () => {
-    this.setState({ loading: true });
-    const pageNumber = 0;
-    const pageSize = 50;
-    const response = await fetchBookList(pageNumber, pageSize);
-    if (response.error) {
-      this.setState({ errorMessage: response.error });
-    } else if (response.bookList) {
-      this.setState({ bookList: response.bookList });
+    try {
+      this.setState({ loading: true });
+      const pageNumber = 0;
+      const pageSize = 50;
+      const response = await fetchBookList(pageNumber, pageSize);
+      if (response.error) {
+        this.setState({ errorMessage: response.error });
+      } else if (response.bookList) {
+        this.setState({ bookList: response.bookList });
+      }
+    } catch (error) {
+      this.setState({ errorMessage: 'Failed to fetch books.' });
+    } finally {
+      this.setState({ loading: false });
     }
-    this.setState({ loading: false });
   };
 
   handleSubmit = async (term: string) => {
-    this.setState({ loading: true });
-    const pageNumber = 0;
-    const pageSize = 50;
-    if (term) {
-      const searchResult = await searchTerm(pageNumber, pageSize, term);
-      if (searchResult.bookList) this.setState({ bookList: searchResult.bookList });
-    } else this.getAllBooks();
-    this.setState({ loading: false });
+    try {
+      this.setState({ loading: true });
+      const pageNumber = 0;
+      const pageSize = 50;
+      if (term) {
+        const searchResult = await searchTerm(pageNumber, pageSize, term);
+        if (searchResult.bookList) this.setState({ bookList: searchResult.bookList });
+      } else this.getAllBooks();
+    } catch (error) {
+      this.setState({ errorMessage: 'Failed to fetch books.' });
+    } finally {
+      this.setState({ loading: false });
+    }
   };
 
   render() {
@@ -49,7 +59,7 @@ export class MainPage extends Component<object, IMainPageState> {
           <SearchBar handleSubmit={this.handleSubmit} term={this.state.term} />
           {loading && <p>Loading...</p>}
           {errorMessage && <p>Error: {errorMessage}</p>}
-          <ListView bookList={bookList} />
+          {!loading && !errorMessage && <ListView bookList={bookList} />}
         </div>
       </div>
     );
