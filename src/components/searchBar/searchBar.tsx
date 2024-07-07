@@ -18,7 +18,7 @@ export class SearchBar extends Component<ISearchBarProps, ISearchBarState> {
 
   onSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    this.props.handleSubmit(this.props.bookList, this.state.searchTerm);
+    this.props.handleSubmit(this.state.searchTerm);
   };
 
   render() {
