@@ -1,14 +1,11 @@
-import { Component } from 'react';
 import { IButtonProps } from './IButton';
 
 import './button.scss';
 
-export class Button extends Component<IButtonProps> {
-  render() {
-    return (
-      <button className="button" type={this.props.type} onClick={this.props.onClick}>
-        {this.props.text}
-      </button>
-    );
-  }
-}
+export const Button: React.FC<IButtonProps> = ({ type, text, onClick }) => {
+  return (
+    <button className="button" type={type} onClick={onClick}>
+      {text}
+    </button>
+  );
+};
