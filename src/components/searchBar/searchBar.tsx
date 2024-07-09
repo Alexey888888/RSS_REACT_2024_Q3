@@ -1,41 +1,36 @@
-import { ChangeEvent, Component, FormEvent } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Button } from '../button/button';
 import { Input } from '../input/input';
-import { ISearchBarProps, ISearchBarState } from './ISearchBar';
+import { ISearchBarProps } from './ISearchBar';
 
 import './searchBar.scss';
 
-export class SearchBar extends Component<ISearchBarProps, ISearchBarState> {
-  constructor(props: ISearchBarProps) {
-    super(props);
-    this.state = { searchTerm: '' };
-  }
+export const SearchBar: React.FC<ISearchBarProps> = ({ handleSubmit }) => {
+  const [searchTerm, setSearchTerm] = useState('');
 
-  componentDidMount(): void {
+  useEffect(() => {
     const storedSearchTerm = localStorage.getItem('searchTerm_888888');
     if (storedSearchTerm) {
-      this.setState({ searchTerm: storedSearchTerm });
+      setSearchTerm(storedSearchTerm);
     }
-  }
+  }, []);
 
-  handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const newSearchTerm = event.target.value.trim();
-    this.setState({ searchTerm: newSearchTerm });
+    setSearchTerm(newSearchTerm);
   };
 
-  onSubmit = (event: FormEvent<HTMLFormElement>): void => {
+  const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    this.props.handleSubmit(this.state.searchTerm);
+    handleSubmit(searchTerm);
   };
 
-  render() {
-    return (
-      <div className="search-bar">
-        <form onSubmit={this.onSubmit}>
-          <Input type="text" value={this.state.searchTerm} onChange={this.handleInputChange} />
-          <Button type="submit" text="Search" />
-        </form>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="search-bar">
+      <form onSubmit={onSubmit}>
+        <Input type="text" value={searchTerm} onChange={handleInputChange} />
+        <Button type="submit" text="Search" />
+      </form>
+    </div>
+  );
+};

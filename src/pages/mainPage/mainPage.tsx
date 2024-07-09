@@ -81,7 +81,7 @@ export const MainPage: React.FC = () => {
         <div className="error-button">
           <Button type="button" text="Error" onClick={handleErrorButtonClick}></Button>
         </div>
-        <SearchBar handleSubmit={handleSubmit} term={state.term} />
+        <SearchBar handleSubmit={handleSubmit} />
         {state.loading && <p className="loading">Loading...</p>}
         {state.errorMessage && <p>Error: {state.errorMessage}</p>}
         {!state.loading && !state.errorMessage && <ListView bookList={state.bookList} />}
