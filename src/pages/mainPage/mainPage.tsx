@@ -53,8 +53,6 @@ export const MainPage: React.FC = () => {
       } finally {
         setState((prevState) => ({ ...prevState, loading: false }));
       }
-
-      localStorage.setItem('searchTerm_888888', term);
     },
     [getAllBooks],
   );

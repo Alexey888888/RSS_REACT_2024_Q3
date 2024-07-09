@@ -1,19 +1,16 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent } from 'react';
 import { Button } from '../button/button';
 import { Input } from '../input/input';
 import { ISearchBarProps } from './ISearchBar';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 import './searchBar.scss';
 
 export const SearchBar: React.FC<ISearchBarProps> = ({ handleSubmit }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    const storedSearchTerm = localStorage.getItem('searchTerm_888888');
-    if (storedSearchTerm) {
-      setSearchTerm(storedSearchTerm);
-    }
-  }, []);
+  const [searchTerm, setSearchTerm, updateLocalStorage] = useLocalStorage({
+    key: 'searchTerm_888888',
+    initValue: '',
+  });
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const newSearchTerm = event.target.value.trim();
@@ -23,6 +20,7 @@ export const SearchBar: React.FC<ISearchBarProps> = ({ handleSubmit }) => {
   const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     handleSubmit(searchTerm);
+    updateLocalStorage();
   };
 
   return (
