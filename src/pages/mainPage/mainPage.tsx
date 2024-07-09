@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SearchBar } from '../../components/searchBar/searchBar';
 import { ListView } from '../../components/listView/listView';
 import { IMainPageState } from './types';
@@ -8,80 +8,84 @@ import { Button } from '../../components/button/button';
 
 import './mainPage.scss';
 
-export class MainPage extends Component<object, IMainPageState> {
-  constructor(props: object) {
-    super(props);
+export const MainPage: React.FC = () => {
+  const [state, setState] = useState<IMainPageState>({
+    bookList: [],
+    errorMessage: '',
+    term: '',
+    loading: false,
+  });
 
-    this.state = { bookList: [], errorMessage: '', term: '', loading: false, hasError: false };
-  }
-
-  componentDidMount = async () => {
-    const searchTerm = localStorage.getItem('searchTerm_888888');
-    if (!searchTerm) {
-      this.getAllBooks();
-    } else {
-      this.setState({ term: searchTerm });
-      this.handleSubmit(searchTerm);
-    }
-  };
-
-  getAllBooks = async () => {
+  const getAllBooks = useCallback(async () => {
     try {
-      this.setState({ loading: true });
+      setState((prevState) => ({ ...prevState, loading: true }));
       const pageNumber = 0;
       const pageSize = 50;
       const response = await fetchBookList(pageNumber, pageSize);
-      if (response.error) {
-        this.setState({ errorMessage: response.error });
-      } else if (response.bookList) {
-        this.setState({ bookList: response.bookList });
+      const responseError = response.error;
+      const responseBookList = response.bookList;
+      if (responseError) {
+        setState((prevState) => ({ ...prevState, errorMessage: responseError }));
+      } else if (responseBookList) {
+        setState((prevState) => ({ ...prevState, bookList: responseBookList }));
       }
     } catch (error) {
-      this.setState({ errorMessage: 'Failed to fetch books.' });
+      setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
     } finally {
-      this.setState({ loading: false });
+      setState((prevState) => ({ ...prevState, loading: false }));
     }
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (term: string) => {
+      try {
+        setState((prevState) => ({ ...prevState, loading: true }));
+        const pageNumber = 0;
+        const pageSize = 50;
+        if (term) {
+          const searchResult = await searchTerm(pageNumber, pageSize, term);
+          const searchResultBookList = searchResult.bookList;
+          if (searchResultBookList)
+            setState((prevState) => ({ ...prevState, bookList: searchResultBookList }));
+        } else getAllBooks();
+      } catch (error) {
+        setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
+      } finally {
+        setState((prevState) => ({ ...prevState, loading: false }));
+      }
+
+      localStorage.setItem('searchTerm_888888', term);
+    },
+    [getAllBooks],
+  );
+
+  const handleErrorButtonClick = () => {
+    setState(() => {
+      throw new Error('Testing error');
+    });
   };
 
-  handleSubmit = async (term: string) => {
-    try {
-      this.setState({ loading: true });
-      const pageNumber = 0;
-      const pageSize = 50;
-      if (term) {
-        const searchResult = await searchTerm(pageNumber, pageSize, term);
-        if (searchResult.bookList) this.setState({ bookList: searchResult.bookList });
-      } else this.getAllBooks();
-    } catch (error) {
-      this.setState({ errorMessage: 'Failed to fetch books.' });
-    } finally {
-      this.setState({ loading: false });
+  useEffect(() => {
+    const searchTerm = localStorage.getItem('searchTerm_888888');
+    if (!searchTerm) {
+      getAllBooks();
+    } else {
+      setState((prevState) => ({ ...prevState, term: searchTerm }));
+      handleSubmit(searchTerm);
     }
+  }, [handleSubmit, getAllBooks]);
 
-    localStorage.setItem('searchTerm_888888', term);
-  };
-
-  handleErrorButtonClick = () => {
-    this.setState({ hasError: true });
-  };
-
-  render() {
-    if (this.state.hasError) throw new Error();
-
-    const { bookList, errorMessage, loading } = this.state;
-
-    return (
-      <div className="main-page">
-        <div className="container">
-          <div className="error-button">
-            <Button type="button" text="Error" onClick={this.handleErrorButtonClick}></Button>
-          </div>
-          <SearchBar handleSubmit={this.handleSubmit} term={this.state.term} />
-          {loading && <p className="loading">Loading...</p>}
-          {errorMessage && <p>Error: {errorMessage}</p>}
-          {!loading && !errorMessage && <ListView bookList={bookList} />}
+  return (
+    <div className="main-page">
+      <div className="container">
+        <div className="error-button">
+          <Button type="button" text="Error" onClick={handleErrorButtonClick}></Button>
         </div>
+        <SearchBar handleSubmit={handleSubmit} term={state.term} />
+        {state.loading && <p className="loading">Loading...</p>}
+        {state.errorMessage && <p>Error: {state.errorMessage}</p>}
+        {!state.loading && !state.errorMessage && <ListView bookList={state.bookList} />}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
