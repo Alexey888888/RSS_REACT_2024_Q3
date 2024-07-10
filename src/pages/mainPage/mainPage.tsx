@@ -5,6 +5,8 @@ import { IMainPageState } from './types';
 import { fetchBookList } from '../../controllers/fetchBookList';
 import { searchTerm } from '../../controllers/searchTerm';
 import { Button } from '../../components/button/button';
+import { Pagination } from '../../components/pagination/paginationComponent';
+import { fetchBookListLength } from '../../controllers/fetchBoorListLength';
 
 import './mainPage.scss';
 
@@ -14,53 +16,57 @@ export const MainPage: React.FC = () => {
     errorMessage: '',
     term: '',
     loading: false,
+    currentPage: 1,
+    booksPerPage: 10,
+    totalBooks: 0,
   });
 
-  const getAllBooks = useCallback(async () => {
-    try {
-      setState((prevState) => ({ ...prevState, loading: true }));
-      const pageNumber = 0;
-      const pageSize = 50;
-      const response = await fetchBookList(pageNumber, pageSize);
-      const responseError = response.error;
-      const responseBookList = response.bookList;
-      if (responseError) {
-        setState((prevState) => ({ ...prevState, errorMessage: responseError }));
-      } else if (responseBookList) {
-        setState((prevState) => ({ ...prevState, bookList: responseBookList }));
-      }
-    } catch (error) {
-      setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
-    } finally {
-      setState((prevState) => ({ ...prevState, loading: false }));
-    }
-  }, []);
-
-  const handleSubmit = useCallback(
-    async (term: string) => {
+  const getAllBooks = useCallback(
+    async (page = 1) => {
       try {
-        setState((prevState) => ({ ...prevState, loading: true }));
-        const pageNumber = 0;
-        const pageSize = 50;
-        if (term) {
-          const searchResult = await searchTerm(pageNumber, pageSize, term);
-          const searchResultBookList = searchResult.bookList;
-          if (searchResultBookList)
-            setState((prevState) => ({ ...prevState, bookList: searchResultBookList }));
-        } else getAllBooks();
+        setState((prevState) => ({ ...prevState, loading: true, currentPage: page }));
+        const pageNumber = page - 1;
+        const pageSize = state.booksPerPage;
+        const response = await fetchBookList(pageNumber, pageSize);
+        const { error, bookList } = response;
+        if (error) {
+          setState((prevState) => ({ ...prevState, errorMessage: error }));
+        } else if (bookList) {
+          setState((prevState) => ({ ...prevState, bookList }));
+        }
       } catch (error) {
         setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
       } finally {
         setState((prevState) => ({ ...prevState, loading: false }));
       }
     },
-    [getAllBooks],
+    [state.booksPerPage],
+  );
+
+  const handleSubmit = useCallback(
+    async (term: string, page = 1) => {
+      try {
+        setState((prevState) => ({ ...prevState, loading: true, currentPage: page }));
+        const pageNumber = page - 1;
+        const pageSize = state.booksPerPage;
+        if (term) {
+          const searchResult = await searchTerm(pageNumber, pageSize, term);
+          const { bookList } = searchResult;
+          if (bookList) setState((prevState) => ({ ...prevState, bookList }));
+        } else {
+          getAllBooks(page);
+        }
+      } catch (error) {
+        setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
+      } finally {
+        setState((prevState) => ({ ...prevState, loading: false }));
+      }
+    },
+    [getAllBooks, state.booksPerPage],
   );
 
   const handleErrorButtonClick = () => {
-    setState(() => {
-      throw new Error('Testing error');
-    });
+    throw new Error('Testing error');
   };
 
   useEffect(() => {
@@ -73,6 +79,27 @@ export const MainPage: React.FC = () => {
     }
   }, [handleSubmit, getAllBooks]);
 
+  useEffect(() => {
+    const getTotalBooks = async () => {
+      const response = await fetchBookListLength();
+      const { bookListLength } = response;
+      if (bookListLength) {
+        setState((prevState) => ({ ...prevState, totalBooks: bookListLength }));
+      } else {
+        setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
+      }
+    };
+    getTotalBooks();
+  }, []);
+
+  const handlePageChange = (page: number) => {
+    if (state.term) {
+      handleSubmit(state.term, page);
+    } else {
+      getAllBooks(page);
+    }
+  };
+
   return (
     <div className="main-page">
       <div className="container">
@@ -82,7 +109,17 @@ export const MainPage: React.FC = () => {
         <SearchBar handleSubmit={handleSubmit} />
         {state.loading && <p className="loading">Loading...</p>}
         {state.errorMessage && <p>Error: {state.errorMessage}</p>}
-        {!state.loading && !state.errorMessage && <ListView bookList={state.bookList} />}
+        {!state.loading && !state.errorMessage && (
+          <>
+            <ListView bookList={state.bookList} />
+            <Pagination
+              booksPerPage={state.booksPerPage}
+              totalBooks={state.totalBooks}
+              currentPage={state.currentPage}
+              onPageChange={handlePageChange}
+            />
+          </>
+        )}
       </div>
     </div>
   );
