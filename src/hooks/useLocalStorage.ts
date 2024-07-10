@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface IUseLocalStorage {
   key: string;
@@ -13,9 +13,26 @@ export const useLocalStorage = ({ key, initValue }: IUseLocalStorage): LocalStor
     return storedTerm ? storedTerm : initValue;
   });
 
+  const valueRef = useRef(value);
+  const keyRef = useRef(key);
+
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  useEffect(() => {
+    keyRef.current = key;
+  }, [key]);
+
   const updateLocalStorage = () => {
-    localStorage.setItem(key, value);
+    localStorage.setItem(keyRef.current, valueRef.current);
   };
+
+  useEffect(() => {
+    return () => {
+      updateLocalStorage();
+    };
+  }, []);
 
   return [value, setValue, updateLocalStorage];
 };
