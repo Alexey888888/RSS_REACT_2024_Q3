@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { IPaginationProps } from './IPagination';
 
 export const Pagination: React.FC<IPaginationProps> = ({
@@ -6,7 +7,18 @@ export const Pagination: React.FC<IPaginationProps> = ({
   currentPage,
   onPageChange,
 }) => {
-  const totalPages = Math.ceil(totalBooks / booksPerPage);
+  const [totalPages, setTotalPages] = useState(0);
+
+  useEffect(() => {
+    if (totalBooks > 0) {
+      const calculatedPages = Math.ceil(totalBooks / booksPerPage);
+      setTotalPages(calculatedPages);
+    }
+  }, [totalBooks, booksPerPage]);
+
+  if (totalPages === 0) {
+    return null;
+  }
 
   const handlePrevious = () => {
     if (currentPage > 1) {
