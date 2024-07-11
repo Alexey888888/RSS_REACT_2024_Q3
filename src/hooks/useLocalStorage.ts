@@ -10,7 +10,7 @@ type LocalStorageTuple = [string, React.Dispatch<React.SetStateAction<string>>, 
 export const useLocalStorage = ({ key, initValue }: IUseLocalStorage): LocalStorageTuple => {
   const [value, setValue] = useState(() => {
     const storedTerm = localStorage.getItem(key);
-    return storedTerm ? storedTerm : initValue;
+    return initValue || storedTerm || '';
   });
 
   const valueRef = useRef(value);

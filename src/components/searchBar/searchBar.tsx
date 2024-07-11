@@ -6,10 +6,11 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 import './searchBar.scss';
 
-export const SearchBar: React.FC<ISearchBarProps> = ({ handleSubmit }) => {
+export const SearchBar: React.FC<ISearchBarProps> = ({ term, handleSubmit }) => {
+  console.log(11, term);
   const [searchTerm, setSearchTerm, updateLocalStorage] = useLocalStorage({
     key: 'searchTerm_888888',
-    initValue: '',
+    initValue: term,
   });
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
