@@ -8,14 +8,21 @@ import { Button } from '../../components/button/button';
 import { Pagination } from '../../components/pagination/paginationComponent';
 
 import './mainPage.scss';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export const MainPage: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const pageQueryParam = parseInt(queryParams.get('page') || '1', 10);
+  console.log(pageQueryParam);
+
   const [state, setState] = useState<IMainPageState>({
     bookList: [],
     errorMessage: '',
     term: '',
     loading: false,
-    currentPage: 1,
+    currentPage: pageQueryParam,
     booksPerPage: 10,
     totalBooks: 0,
   });
@@ -52,9 +59,7 @@ export const MainPage: React.FC = () => {
           const searchResult = await searchTerm(pageNumber, pageSize, term);
           const { bookList, totalElements } = searchResult;
           if (bookList && totalElements) {
-            setState((prevState) => ({ ...prevState, bookList }));
-            const totalBooks = totalElements;
-            setState((prevState) => ({ ...prevState, totalBooks }));
+            setState((prevState) => ({ ...prevState, bookList, totalBooks: totalElements }));
           }
         } else {
           getAllBooks(page);
@@ -63,9 +68,10 @@ export const MainPage: React.FC = () => {
         setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
       } finally {
         setState((prevState) => ({ ...prevState, loading: false }));
+        navigate(`?page=${page}`);
       }
     },
-    [getAllBooks, state.booksPerPage],
+    [getAllBooks, navigate, state.booksPerPage],
   );
 
   const handleErrorButtonClick = () => {
@@ -75,14 +81,15 @@ export const MainPage: React.FC = () => {
   useEffect(() => {
     const searchTerm = localStorage.getItem('searchTerm_888888');
     if (!searchTerm) {
-      getAllBooks();
+      getAllBooks(state.currentPage);
     } else {
       setState((prevState) => ({ ...prevState, term: searchTerm }));
-      handleSubmit(searchTerm);
+      handleSubmit(searchTerm, state.currentPage);
     }
-  }, [handleSubmit, getAllBooks]);
+  }, [handleSubmit, getAllBooks, state.currentPage]);
 
   const handlePageChange = (page: number) => {
+    setState((prevState) => ({ ...prevState, currentPage: page }));
     handleSubmit(state.term, page);
   };
 
