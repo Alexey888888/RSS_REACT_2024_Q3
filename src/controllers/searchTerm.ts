@@ -6,7 +6,7 @@ export const searchTerm = async (
   term: string,
 ): Promise<IResponse> => {
   const apiUrl = 'https://stapi.co/api/v2/rest/book/search';
-  const body = `pageNumber=${pageNumber}&pageSize=${pageSize}&title=${encodeURIComponent(term)}`;
+  const body = `title=${encodeURIComponent(term)}`;
 
   const requestOptions = {
     method: 'POST',
@@ -17,7 +17,10 @@ export const searchTerm = async (
   };
 
   try {
-    const response = await fetch(apiUrl, requestOptions);
+    const response = await fetch(
+      `${apiUrl}?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+      requestOptions,
+    );
     const responseObj = await response.json();
     return { bookList: responseObj.books, totalElements: responseObj.page.totalElements };
   } catch (error) {
