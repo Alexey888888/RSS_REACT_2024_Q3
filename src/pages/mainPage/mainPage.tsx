@@ -45,7 +45,7 @@ export const MainPage: React.FC = () => {
   const handleSubmit = useCallback(
     async (term: string, page = 1) => {
       try {
-        setState((prevState) => ({ ...prevState, loading: true, currentPage: page }));
+        setState((prevState) => ({ ...prevState, loading: true, currentPage: page, term }));
         const pageNumber = page - 1;
         const pageSize = state.booksPerPage;
         if (term) {
@@ -83,11 +83,7 @@ export const MainPage: React.FC = () => {
   }, [handleSubmit, getAllBooks]);
 
   const handlePageChange = (page: number) => {
-    if (state.term) {
-      handleSubmit(state.term, page);
-    } else {
-      getAllBooks(page);
-    }
+    handleSubmit(state.term, page);
   };
 
   return (
