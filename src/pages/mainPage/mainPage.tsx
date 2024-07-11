@@ -6,9 +6,9 @@ import { fetchBookList } from '../../controllers/fetchBookList';
 import { searchTerm } from '../../controllers/searchTerm';
 import { Button } from '../../components/button/button';
 import { Pagination } from '../../components/pagination/paginationComponent';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import './mainPage.scss';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 export const MainPage: React.FC = () => {
   const navigate = useNavigate();

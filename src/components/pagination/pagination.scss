@@ -1,0 +1,15 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 50px;
+
+  nav {
+    display: flex;
+    align-items: baseline;
+    column-gap: 10px;
+
+    button {
+      width: 82.85px;
+    }
+  }
+}

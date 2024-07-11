@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { IPaginationProps } from './IPagination';
 
+import './pagination.scss';
+
 export const Pagination: React.FC<IPaginationProps> = ({
   booksPerPage,
   totalBooks,
@@ -33,16 +35,18 @@ export const Pagination: React.FC<IPaginationProps> = ({
   };
 
   return (
-    <nav className="pagination">
-      <button onClick={handlePrevious} disabled={currentPage === 1}>
-        Previous
-      </button>
-      <span>
-        {currentPage} of {totalPages}
-      </span>
-      <button onClick={handleNext} disabled={currentPage === totalPages}>
-        Next
-      </button>
-    </nav>
+    <div className="pagination">
+      <nav>
+        <button className="button" onClick={handlePrevious} disabled={currentPage === 1}>
+          Previous
+        </button>
+        <span>
+          {currentPage} of {totalPages}
+        </span>
+        <button className="button" onClick={handleNext} disabled={currentPage === totalPages}>
+          Next
+        </button>
+      </nav>
+    </div>
   );
 };
