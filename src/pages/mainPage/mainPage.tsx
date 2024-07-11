@@ -6,7 +6,6 @@ import { fetchBookList } from '../../controllers/fetchBookList';
 import { searchTerm } from '../../controllers/searchTerm';
 import { Button } from '../../components/button/button';
 import { Pagination } from '../../components/pagination/paginationComponent';
-import { fetchBookListLength } from '../../controllers/fetchBoorListLength';
 
 import './mainPage.scss';
 
@@ -28,11 +27,11 @@ export const MainPage: React.FC = () => {
         const pageNumber = page - 1;
         const pageSize = state.booksPerPage;
         const response = await fetchBookList(pageNumber, pageSize);
-        const { error, bookList } = response;
+        const { error, bookList, totalElements } = response;
         if (error) {
           setState((prevState) => ({ ...prevState, errorMessage: error }));
-        } else if (bookList) {
-          setState((prevState) => ({ ...prevState, bookList }));
+        } else if (bookList && totalElements) {
+          setState((prevState) => ({ ...prevState, bookList, totalBooks: totalElements }));
         }
       } catch (error) {
         setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
@@ -51,8 +50,12 @@ export const MainPage: React.FC = () => {
         const pageSize = state.booksPerPage;
         if (term) {
           const searchResult = await searchTerm(pageNumber, pageSize, term);
-          const { bookList } = searchResult;
-          if (bookList) setState((prevState) => ({ ...prevState, bookList }));
+          const { bookList, totalElements } = searchResult;
+          if (bookList && totalElements) {
+            setState((prevState) => ({ ...prevState, bookList }));
+            const totalBooks = totalElements;
+            setState((prevState) => ({ ...prevState, totalBooks }));
+          }
         } else {
           getAllBooks(page);
         }
@@ -78,19 +81,6 @@ export const MainPage: React.FC = () => {
       handleSubmit(searchTerm);
     }
   }, [handleSubmit, getAllBooks]);
-
-  useEffect(() => {
-    const getTotalBooks = async () => {
-      const response = await fetchBookListLength();
-      const { bookListLength } = response;
-      if (bookListLength) {
-        setState((prevState) => ({ ...prevState, totalBooks: bookListLength }));
-      } else {
-        setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
-      }
-    };
-    getTotalBooks();
-  }, []);
 
   const handlePageChange = (page: number) => {
     if (state.term) {

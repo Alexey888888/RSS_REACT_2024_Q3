@@ -1,10 +1,10 @@
-import { IBook } from '../pages/mainPage/types';
+import { IResponse } from './types';
 
 export const searchTerm = async (
   pageNumber: number,
   pageSize: number,
   term: string,
-): Promise<{ bookList?: IBook[]; error?: string }> => {
+): Promise<IResponse> => {
   const apiUrl = 'https://stapi.co/api/v2/rest/book/search';
   const body = `pageNumber=${pageNumber}&pageSize=${pageSize}&title=${encodeURIComponent(term)}`;
 
@@ -19,7 +19,7 @@ export const searchTerm = async (
   try {
     const response = await fetch(apiUrl, requestOptions);
     const responseObj = await response.json();
-    return { bookList: responseObj.books };
+    return { bookList: responseObj.books, totalElements: responseObj.page.totalElements };
   } catch (error) {
     return { error: (error as Error).message };
   }
