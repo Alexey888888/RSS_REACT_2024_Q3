@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ErrorBoundary } from './components/errorBoundary/errorBoundary';
 import { MainPage } from './pages/mainPage/mainPage';
-import { NotFoundPage } from './pages/notFondPage/notFounPage';
+import { NotFoundPage } from './pages/notFondPage/notFoundPage';
 
 function App() {
   return (

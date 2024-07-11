@@ -25,6 +25,7 @@ export const MainPage: React.FC = () => {
     currentPage: pageQueryParam,
     booksPerPage: 10,
     totalBooks: 0,
+    hasError: false,
   });
 
   const getAllBooks = useCallback(
@@ -75,7 +76,7 @@ export const MainPage: React.FC = () => {
   );
 
   const handleErrorButtonClick = () => {
-    throw new Error('Testing error');
+    setState((prevState) => ({ ...prevState, hasError: true }));
   };
 
   useEffect(() => {
@@ -93,6 +94,8 @@ export const MainPage: React.FC = () => {
     setState((prevState) => ({ ...prevState, currentPage: page }));
     handleSubmit(state.term, page);
   };
+
+  if (state.hasError) throw new Error();
 
   return (
     <div className="main-page">

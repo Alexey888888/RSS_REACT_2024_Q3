@@ -34,4 +34,5 @@ export interface IMainPageState {
   currentPage: number;
   booksPerPage: number;
   totalBooks: number;
+  hasError: boolean;
 }
