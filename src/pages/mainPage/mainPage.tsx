@@ -65,8 +65,6 @@ export const MainPage: React.FC = () => {
         const pageNumber = page - 1;
         const pageSize = state.booksPerPage;
 
-        console.log(term);
-
         if (term) {
           const searchResult = await searchTerm(pageNumber, pageSize, term);
           const { bookList, totalElements } = searchResult;
@@ -88,7 +86,7 @@ export const MainPage: React.FC = () => {
         setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
       } finally {
         setState((prevState) => ({ ...prevState, loading: false }));
-        navigate(`?search=${term}&page=${page}`);
+        navigate(`?search=${term}&page=${page}`, { replace: true });
       }
     },
     [getAllBooks, navigate, state.booksPerPage],
@@ -99,24 +97,16 @@ export const MainPage: React.FC = () => {
   };
 
   useEffect(() => {
-    const handlePopstate = () => {
-      const newQueryParams = new URLSearchParams(window.location.search);
-      const newPage = parseInt(newQueryParams.get('page') || '1', 10);
-      const newSearch = newQueryParams.get('search') || '';
+    const queryParams = new URLSearchParams(location.search);
+    const newPage = parseInt(queryParams.get('page') || '1', 10);
+    const newSearch = queryParams.get('search') || '';
 
-      setState((prevState) => ({
-        ...prevState,
-        currentPage: newPage,
-        term: newSearch,
-      }));
-    };
-
-    window.addEventListener('popstate', handlePopstate);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopstate);
-    };
-  }, []);
+    setState((prevState) => ({
+      ...prevState,
+      currentPage: newPage,
+      term: newSearch,
+    }));
+  }, [location.search]);
 
   useEffect(() => {
     const searchTerm = state.term || localStorage.getItem('searchTerm_888888');
@@ -142,7 +132,7 @@ export const MainPage: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     setState((prevState) => ({ ...prevState, currentPage: page }));
-    handleSubmit(state.term, page);
+    navigate(`?search=${state.term}&page=${page}`);
   };
 
   if (state.hasError) throw new Error();
