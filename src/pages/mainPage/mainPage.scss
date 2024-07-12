@@ -1,8 +1,23 @@
 .main-page {
-  .error-button {
-    padding: 20px;
+  .header {
     display: flex;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+
+    @media (max-width: 620px) {
+      flex-direction: column-reverse;
+    }
+
+    .search-bar-container {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .error-button {
+      margin-left: auto;
+    }
   }
 
   .loading {

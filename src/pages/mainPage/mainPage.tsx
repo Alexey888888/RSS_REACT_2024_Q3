@@ -23,7 +23,7 @@ export const MainPage: React.FC = () => {
     term: searchQueryParam,
     loading: false,
     currentPage: pageQueryParam,
-    booksPerPage: 10,
+    booksPerPage: 15,
     totalBooks: 0,
     hasError: false,
   });
@@ -100,10 +100,14 @@ export const MainPage: React.FC = () => {
   return (
     <div className="main-page">
       <div className="container">
-        <div className="error-button">
-          <Button type="button" text="Error" onClick={handleErrorButtonClick}></Button>
-        </div>
-        <SearchBar handleSubmit={handleSubmit} term={state.term} />
+        <header className="header">
+          <div className="search-bar-container">
+            <SearchBar handleSubmit={handleSubmit} term={state.term} />
+          </div>
+          <div className="error-button">
+            <Button type="button" text="Test error" onClick={handleErrorButtonClick}></Button>
+          </div>
+        </header>
         {state.loading && <p className="loading">Loading...</p>}
         {state.errorMessage && <p>Error: {state.errorMessage}</p>}
         {!state.loading && !state.errorMessage && (

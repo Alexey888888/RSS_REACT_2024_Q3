@@ -9,11 +9,7 @@ export const ListView: React.FC<IListView> = ({ bookList }) => {
       <ul className="book-list">
         {bookList.map((book) => (
           <li key={book.uid}>
-            <BookCard
-              title={book.title}
-              publishedYear={book.publishedYear}
-              numberOfPages={book.numberOfPages}
-            />
+            <BookCard title={book.title} />
           </li>
         ))}
       </ul>

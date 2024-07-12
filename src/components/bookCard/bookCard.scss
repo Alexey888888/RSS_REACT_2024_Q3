@@ -4,7 +4,14 @@
 
   .book-card__inner {
     padding: 10px;
-    width: 200px;
-    height: 200px;
+    width: 220px;
+    min-height: 125px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    p {
+      text-align: center;
+    }
   }
 }
