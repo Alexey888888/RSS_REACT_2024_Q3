@@ -53,14 +53,33 @@ export const MainPage: React.FC = () => {
   const handleSubmit = useCallback(
     async (term: string, page = 1) => {
       try {
-        setState((prevState) => ({ ...prevState, loading: true, currentPage: page, term }));
+        setState((prevState) => ({
+          ...prevState,
+          loading: true,
+          currentPage: page,
+          term,
+          errorMessage: '',
+          bookList: [],
+          totalBooks: 0,
+        }));
         const pageNumber = page - 1;
         const pageSize = state.booksPerPage;
+
+        console.log(term);
+
         if (term) {
           const searchResult = await searchTerm(pageNumber, pageSize, term);
           const { bookList, totalElements } = searchResult;
-          if (bookList && totalElements) {
+
+          if (bookList && totalElements && totalElements > 0) {
             setState((prevState) => ({ ...prevState, bookList, totalBooks: totalElements }));
+          } else {
+            setState((prevState) => ({
+              ...prevState,
+              bookList: [],
+              totalBooks: 0,
+              errorMessage: 'No books found for this term.',
+            }));
           }
         } else {
           getAllBooks(page);
@@ -100,13 +119,16 @@ export const MainPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const searchTerm = state.term || localStorage.getItem('searchTerm_888888');
+
     const fetchBooks = async () => {
       try {
         setState((prevState) => ({ ...prevState, loading: true }));
-        if (!state.term) {
+        if (!searchTerm) {
           await getAllBooks(state.currentPage);
         } else {
-          await handleSubmit(state.term, state.currentPage);
+          setState((prevState) => ({ ...prevState, term: searchTerm }));
+          await handleSubmit(searchTerm, state.currentPage);
         }
       } catch (error) {
         setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
@@ -116,7 +138,7 @@ export const MainPage: React.FC = () => {
     };
 
     fetchBooks();
-  }, [getAllBooks, handleSubmit, state.currentPage, state.term]);
+  }, [handleSubmit, getAllBooks, state.currentPage, state.term]);
 
   const handlePageChange = (page: number) => {
     setState((prevState) => ({ ...prevState, currentPage: page }));
@@ -137,7 +159,7 @@ export const MainPage: React.FC = () => {
           </div>
         </header>
         {state.loading && <p className="loading">Loading...</p>}
-        {state.errorMessage && <p>Error: {state.errorMessage}</p>}
+        {state.errorMessage && <p>{state.errorMessage}</p>}
         {!state.loading && !state.errorMessage && (
           <>
             <ListView bookList={state.bookList} />
