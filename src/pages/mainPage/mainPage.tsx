@@ -80,15 +80,43 @@ export const MainPage: React.FC = () => {
   };
 
   useEffect(() => {
-    const searchTerm = state.term || localStorage.getItem('searchTerm_888888');
-    console.log(searchTerm);
-    if (!searchTerm) {
-      getAllBooks(state.currentPage);
-    } else {
-      setState((prevState) => ({ ...prevState, term: searchTerm }));
-      handleSubmit(searchTerm, state.currentPage);
-    }
-  }, [handleSubmit, getAllBooks, state.currentPage, state.term]);
+    const handlePopstate = () => {
+      const newQueryParams = new URLSearchParams(window.location.search);
+      const newPage = parseInt(newQueryParams.get('page') || '1', 10);
+      const newSearch = newQueryParams.get('search') || '';
+
+      setState((prevState) => ({
+        ...prevState,
+        currentPage: newPage,
+        term: newSearch,
+      }));
+    };
+
+    window.addEventListener('popstate', handlePopstate);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopstate);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        setState((prevState) => ({ ...prevState, loading: true }));
+        if (!state.term) {
+          await getAllBooks(state.currentPage);
+        } else {
+          await handleSubmit(state.term, state.currentPage);
+        }
+      } catch (error) {
+        setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
+      } finally {
+        setState((prevState) => ({ ...prevState, loading: false }));
+      }
+    };
+
+    fetchBooks();
+  }, [getAllBooks, handleSubmit, state.currentPage, state.term]);
 
   const handlePageChange = (page: number) => {
     setState((prevState) => ({ ...prevState, currentPage: page }));
