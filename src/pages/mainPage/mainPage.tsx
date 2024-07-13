@@ -134,6 +134,11 @@ export const MainPage: React.FC = () => {
     navigate(`/details/${bookUid}?search=${state.term}&page=${state.currentPage}`);
   };
 
+  const handleCloseDetails = () => {
+    const queryParams = `?search=${state.term}&page=${state.currentPage}`;
+    navigate('/' + queryParams);
+  };
+
   const handlePageChange = (page: number) => {
     setState((prevState) => ({ ...prevState, currentPage: page }));
     navigate(`?search=${state.term}&page=${page}`);
@@ -170,7 +175,7 @@ export const MainPage: React.FC = () => {
               </>
             )}
           </div>
-          <Outlet />
+          <Outlet context={{ handleCloseDetails }} />
         </main>
       </div>
     </div>

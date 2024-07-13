@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import { fetchBookDetails } from '../../controllers/fetchBookDetails';
 import { Button } from '../../components/button/button';
 import { IFetchDetailBook } from '../../controllers/types';
 
 import './details.scss';
 
+interface DetailsProps {
+  handleCloseDetails: () => void;
+}
+
 export const Details: React.FC = () => {
   const { bookUid } = useParams<{ bookUid: string }>();
   const [book, setBook] = useState<IFetchDetailBook | null>(null);
   const [loading, setLoading] = useState(true);
+  const { handleCloseDetails } = useOutletContext<DetailsProps>();
 
   useEffect(() => {
     const getBookDetails = async () => {
@@ -21,17 +26,13 @@ export const Details: React.FC = () => {
     getBookDetails();
   }, [bookUid]);
 
-  const handleClose = () => {
-    console.log(close);
-  };
-
   if (loading) {
     return <p className="loading">Loading...</p>;
   }
 
   return (
     <div className="details">
-      <Button type="button" text="Close" onClick={handleClose} />
+      <Button type="button" text="Close" onClick={handleCloseDetails} />
       <h3>Title: {book?.book?.title}</h3>
       <ul className="book-detail__list">
         {book?.book?.authors && book?.book?.authors.length > 0 && (
