@@ -131,7 +131,7 @@ export const MainPage: React.FC = () => {
   }, [handleSubmit, getAllBooks, state.currentPage, state.term]);
 
   const handleBookClick = (bookUid: string) => {
-    navigate(`/details/${bookUid}`);
+    navigate(`/details/${bookUid}?search=${state.term}&page=${state.currentPage}`);
   };
 
   const handlePageChange = (page: number) => {

@@ -32,7 +32,23 @@ export const Details: React.FC = () => {
   return (
     <div className="details">
       <Button type="button" text="Close" onClick={handleClose} />
-      <h3>{book?.book?.title}</h3>
+      <h3>Title: {book?.book?.title}</h3>
+      <ul className="book-detail__list">
+        {book?.book?.authors && book?.book?.authors.length > 0 && (
+          <li>
+            <b>Author: </b>
+            <ul>{book?.book?.authors.map((author) => <li key={author.uid}>{author.name}</li>)}</ul>
+          </li>
+        )}
+        <li>
+          <b>Published year: </b>
+          {book?.book?.publishedYear}
+        </li>
+        <li>
+          <b>Number of pages: </b>
+          {book?.book?.numberOfPages}
+        </li>
+      </ul>
     </div>
   );
 };
