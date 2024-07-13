@@ -6,7 +6,7 @@ import { fetchBookList } from '../../controllers/fetchBookList';
 import { searchTerm } from '../../controllers/searchTerm';
 import { Button } from '../../components/button/button';
 import { Pagination } from '../../components/pagination/paginationComponent';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 
 import './mainPage.scss';
 
@@ -130,10 +130,16 @@ export const MainPage: React.FC = () => {
     fetchBooks();
   }, [handleSubmit, getAllBooks, state.currentPage, state.term]);
 
+  const handleBookClick = (bookUid: string) => {
+    navigate(`/details/${bookUid}`);
+  };
+
   const handlePageChange = (page: number) => {
     setState((prevState) => ({ ...prevState, currentPage: page }));
     navigate(`?search=${state.term}&page=${page}`);
   };
+
+  const outletExists = !!useLocation().pathname.includes('details');
 
   if (state.hasError) throw new Error();
 
@@ -148,19 +154,24 @@ export const MainPage: React.FC = () => {
             <Button type="button" text="Test error" onClick={handleErrorButtonClick}></Button>
           </div>
         </header>
-        {state.loading && <p className="loading">Loading...</p>}
-        {state.errorMessage && <p>{state.errorMessage}</p>}
-        {!state.loading && !state.errorMessage && (
-          <>
-            <ListView bookList={state.bookList} />
-            <Pagination
-              booksPerPage={state.booksPerPage}
-              totalBooks={state.totalBooks}
-              currentPage={state.currentPage}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
+        <main className="main__wrapper">
+          <div style={outletExists ? { width: '270px' } : {}}>
+            {state.loading && <p className="loading">Loading...</p>}
+            {state.errorMessage && <p>{state.errorMessage}</p>}
+            {!state.loading && !state.errorMessage && (
+              <>
+                <ListView bookList={state.bookList} onBookClick={handleBookClick} />
+                <Pagination
+                  booksPerPage={state.booksPerPage}
+                  totalBooks={state.totalBooks}
+                  currentPage={state.currentPage}
+                  onPageChange={handlePageChange}
+                />
+              </>
+            )}
+          </div>
+          <Outlet />
+        </main>
       </div>
     </div>
   );

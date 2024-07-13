@@ -1,6 +1,6 @@
-import { IResponse } from './types';
+import { IFetchBooks } from './types';
 
-export const fetchBookList = async (pageNumber: number, pageSize: number): Promise<IResponse> => {
+export const fetchBookList = async (pageNumber: number, pageSize: number): Promise<IFetchBooks> => {
   const apiUrl = 'https://stapi.co/api/v2/rest/book/search';
 
   try {

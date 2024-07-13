@@ -1,10 +1,10 @@
-import { IResponse } from './types';
+import { IFetchBooks } from './types';
 
 export const searchTerm = async (
   pageNumber: number,
   pageSize: number,
   term: string,
-): Promise<IResponse> => {
+): Promise<IFetchBooks> => {
   const apiUrl = 'https://stapi.co/api/v2/rest/book/search';
   const body = `title=${encodeURIComponent(term)}`;
 
