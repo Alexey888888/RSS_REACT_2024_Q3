@@ -6,7 +6,7 @@ export interface IFetchBooks {
   error?: string;
 }
 
-interface IAuthor {
+export interface IAuthor {
   uid: string;
   name: string;
   birthName: string;
@@ -75,7 +75,7 @@ interface IAuthor {
   writer: boolean;
 }
 
-interface IArtist {
+export interface IArtist {
   uid: string;
   name: string;
   birthName: string;
@@ -144,7 +144,7 @@ interface IArtist {
   writer: boolean;
 }
 
-interface IPublisher {
+export interface IPublisher {
   uid: string;
   name: string;
   broadcaster: boolean;
