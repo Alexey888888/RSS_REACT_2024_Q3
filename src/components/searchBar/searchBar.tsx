@@ -1,41 +1,35 @@
-import { ChangeEvent, Component, FormEvent } from 'react';
+import { ChangeEvent, FormEvent } from 'react';
 import { Button } from '../button/button';
 import { Input } from '../input/input';
-import { ISearchBarProps, ISearchBarState } from './ISearchBar';
+import { ISearchBarProps } from './ISearchBar';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 import './searchBar.scss';
 
-export class SearchBar extends Component<ISearchBarProps, ISearchBarState> {
-  constructor(props: ISearchBarProps) {
-    super(props);
-    this.state = { searchTerm: '' };
-  }
+export const SearchBar: React.FC<ISearchBarProps> = ({ term, handleSubmit }) => {
+  const [searchTerm, setSearchTerm, updateLocalStorage] = useLocalStorage({
+    key: 'searchTerm_888888',
+    initValue: term,
+  });
 
-  componentDidMount(): void {
-    const storedSearchTerm = localStorage.getItem('searchTerm_888888');
-    if (storedSearchTerm) {
-      this.setState({ searchTerm: storedSearchTerm });
-    }
-  }
-
-  handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const newSearchTerm = event.target.value.trim();
-    this.setState({ searchTerm: newSearchTerm });
+    setSearchTerm(newSearchTerm);
   };
 
-  onSubmit = (event: FormEvent<HTMLFormElement>): void => {
+  const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    this.props.handleSubmit(this.state.searchTerm);
+    handleSubmit(searchTerm);
+    updateLocalStorage();
   };
 
-  render() {
-    return (
-      <div className="search-bar">
-        <form onSubmit={this.onSubmit}>
-          <Input type="text" value={this.state.searchTerm} onChange={this.handleInputChange} />
-          <Button type="submit" text="Search" />
-        </form>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="search-bar">
+      <h2>Search for a Star Trek books</h2>
+      <form onSubmit={onSubmit}>
+        <Input type="text" value={searchTerm} onChange={handleInputChange} />
+        <Button type="submit" text="Search" />
+      </form>
+    </div>
+  );
+};

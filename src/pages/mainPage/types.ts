@@ -31,5 +31,8 @@ export interface IMainPageState {
   errorMessage: string;
   term: string;
   loading: boolean;
+  currentPage: number;
+  booksPerPage: number;
+  totalBooks: number;
   hasError: boolean;
 }
