@@ -28,6 +28,8 @@ export const MainPage: React.FC = () => {
     hasError: false,
   });
 
+  const [shouldFetch, setShouldFetch] = useState(false);
+
   const getAllBooks = useCallback(
     async (page = 1) => {
       try {
@@ -106,9 +108,12 @@ export const MainPage: React.FC = () => {
       currentPage: newPage,
       term: newSearch,
     }));
+    setShouldFetch(true);
   }, [location.search]);
 
   useEffect(() => {
+    if (!shouldFetch) return;
+
     const searchTerm = state.term || localStorage.getItem('searchTerm_888888');
 
     const fetchBooks = async () => {
@@ -128,7 +133,9 @@ export const MainPage: React.FC = () => {
     };
 
     fetchBooks();
-  }, [handleSubmit, getAllBooks, state.currentPage, state.term]);
+
+    setShouldFetch(false);
+  }, [handleSubmit, getAllBooks, state.currentPage, state.term, shouldFetch]);
 
   const handleBookClick = (bookUid: string) => {
     navigate(`/details/${bookUid}?search=${state.term}&page=${state.currentPage}`);
