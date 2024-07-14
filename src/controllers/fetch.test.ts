@@ -46,7 +46,7 @@ describe('Book API Tests', () => {
 
   it('Test searchTerm', async () => {
     const pageNumber = 1;
-    const pageSize = 10;
+    const pageSize = 100;
     const term = 'Book';
     const result = await searchTerm(pageNumber, pageSize, term);
     expect(result).toEqual(mockFetchBooks);
