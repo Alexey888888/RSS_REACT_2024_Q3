@@ -1,29 +1,31 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { SearchBar } from '../../components/searchBar/searchBar';
 import { ListView } from '../../components/listView/listView';
-import { IMainPageState } from './types';
-import { useFetchAllBooksQuery, useSearchTermMutation } from '../../controllers/starTrekApi';
 import { Button } from '../../components/button/button';
 import { Pagination } from '../../components/pagination/paginationComponent';
-import { useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { RootState } from '../../redux/store';
+import { useFetchAllBooksQuery, useSearchTermMutation } from '../../controllers/starTrekApi';
+import { setPage, setTerm } from '../../redux/slices/paginationSlice';
+import { setSelectedItem } from '../../redux/slices/selectedItemSlice';
 
 import './mainPage.scss';
+import { IMainPageState } from './types';
 
 export const MainPage: React.FC = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const pageQueryParam = parseInt(queryParams.get('page') || '1', 10);
-  const searchQueryParam = queryParams.get('search') || '';
 
-  const [shouldFetch, setShouldFetch] = useState(false);
+  const { currentPage, term } = useSelector((state: RootState) => state.pagination);
 
-  const [state, setState] = useState<IMainPageState>({
+  const [state, setState] = React.useState<IMainPageState>({
     bookList: [],
     errorMessage: '',
-    term: searchQueryParam,
+    term: term,
     loading: false,
-    currentPage: pageQueryParam,
+    currentPage: currentPage,
     booksPerPage: 15,
     totalBooks: 0,
     hasError: false,
@@ -38,7 +40,7 @@ export const MainPage: React.FC = () => {
     pageSize: state.booksPerPage,
   });
 
-  const [searchTermRRR] = useSearchTermMutation();
+  const [searchTerm] = useSearchTermMutation();
 
   const handleSubmit = useCallback(
     async (term: string, page = 1) => {
@@ -56,7 +58,7 @@ export const MainPage: React.FC = () => {
         const pageSize = state.booksPerPage;
 
         if (term) {
-          const searchResult = await searchTermRRR({ pageNumber, pageSize, term });
+          const searchResult = await searchTerm({ pageNumber, pageSize, term });
           const bookList = searchResult.data?.books;
           const totalElements = searchResult.data?.page.totalElements;
 
@@ -77,9 +79,8 @@ export const MainPage: React.FC = () => {
             }));
           }
         } else {
-          console.log(888);
           navigate(`?search=&page=${page}`);
-          setShouldFetch(true);
+          dispatch(setTerm(''));
         }
       } catch (error) {
         setState((prevState) => ({
@@ -89,11 +90,11 @@ export const MainPage: React.FC = () => {
         }));
       }
     },
-    [navigate, searchTermRRR, state.booksPerPage],
+    [dispatch, navigate, searchTerm, state.booksPerPage],
   );
 
   useEffect(() => {
-    const searchTerm = state.term || localStorage.getItem('searchTerm_888888');
+    const searchTerm = term || localStorage.getItem('searchTerm_888888');
 
     const fetchBooks = async () => {
       try {
@@ -127,20 +128,11 @@ export const MainPage: React.FC = () => {
         setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
       } finally {
         setState((prevState) => ({ ...prevState, loading: false }));
-        setShouldFetch(false);
       }
     };
 
     fetchBooks();
-  }, [
-    allBooks,
-    allBooksError,
-    handleSubmit,
-    allBooksIsLoading,
-    shouldFetch,
-    state.currentPage,
-    state.term,
-  ]);
+  }, [allBooks, allBooksError, handleSubmit, allBooksIsLoading, state.currentPage, term]);
 
   const handleErrorButtonClick = () => {
     setState((prevState) => ({ ...prevState, hasError: true }));
@@ -155,10 +147,10 @@ export const MainPage: React.FC = () => {
       currentPage: newPage,
       term: newSearch,
     }));
-    setShouldFetch(true);
   }, [location.search]);
 
   const handleBookClick = (bookUid: string) => {
+    dispatch(setSelectedItem(bookUid));
     navigate(`/details/${bookUid}?search=${state.term}&page=${state.currentPage}`);
   };
 
@@ -168,9 +160,8 @@ export const MainPage: React.FC = () => {
   };
 
   const handlePageChange = (page: number) => {
-    setState((prevState) => ({ ...prevState, currentPage: page }));
+    dispatch(setPage(page));
     navigate(`?search=${state.term}&page=${page}`);
-    setShouldFetch(true);
   };
 
   const outletExists = !!useLocation().pathname.includes('details');
