@@ -19,7 +19,10 @@ export const bookApi = createApi({
         },
       }),
     }),
+    fetchBookDetails: builder.query({
+      query: (uid) => `/book?uid=${uid}`,
+    }),
   }),
 });
 
-export const { useFetchAllBooksQuery, useSearchTermMutation } = bookApi;
+export const { useFetchAllBooksQuery, useSearchTermMutation, useFetchBookDetailsQuery } = bookApi;

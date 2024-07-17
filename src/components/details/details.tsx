@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
-import { fetchBookDetails } from '../../controllers/fetchBookDetails';
 import { Button } from '../../components/button/button';
-import { IFetchDetailBook } from '../../controllers/types';
 
 import './details.scss';
+import { useFetchBookDetailsQuery } from '../../controllers/starTrekApi';
 
 interface DetailsProps {
   handleCloseDetails: () => void;
@@ -12,43 +10,46 @@ interface DetailsProps {
 
 export const Details: React.FC = () => {
   const { bookUid } = useParams<{ bookUid: string }>();
-  const [book, setBook] = useState<IFetchDetailBook | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: bookDetails, error, isLoading } = useFetchBookDetailsQuery(bookUid!);
   const { handleCloseDetails } = useOutletContext<DetailsProps>();
 
-  useEffect(() => {
-    const getBookDetails = async () => {
-      const bookDetails = await fetchBookDetails(bookUid!);
-      setBook(bookDetails);
-      setLoading(false);
-    };
-
-    getBookDetails();
-  }, [bookUid]);
-
-  if (loading) {
+  if (isLoading) {
     return <p className="loading">Loading...</p>;
   }
+
+  if (error) {
+    return <p className="error">Failed to load book details.</p>;
+  }
+
+  const book = bookDetails?.book;
 
   return (
     <div className="details">
       <Button type="button" text="Close" onClick={handleCloseDetails} />
-      <h3>Title: {book?.book?.title}</h3>
+      <h3>Title: {book?.title}</h3>
       <ul className="book-detail__list">
-        {book?.book?.authors && book?.book?.authors.length > 0 && (
+        {book?.authors && book?.authors.length > 0 && (
           <li>
             <b>Author: </b>
-            <ul>{book?.book?.authors.map((author) => <li key={author.uid}>{author.name}</li>)}</ul>
+            <ul>
+              {book?.authors.map((author: { uid: number; name: string }) => (
+                <li key={author.uid}>{author.name}</li>
+              ))}
+            </ul>
           </li>
         )}
-        <li>
-          <b>Published year: </b>
-          {book?.book?.publishedYear}
-        </li>
-        <li>
-          <b>Number of pages: </b>
-          {book?.book?.numberOfPages}
-        </li>
+        {book?.publishedYear && book?.authors.length > 0 && (
+          <li>
+            <b>Published year: </b>
+            {book?.publishedYear}
+          </li>
+        )}
+        {book?.numberOfPages && book?.authors.length > 0 && (
+          <li>
+            <b>Number of pages: </b>
+            {book?.numberOfPages}
+          </li>
+        )}
       </ul>
     </div>
   );
