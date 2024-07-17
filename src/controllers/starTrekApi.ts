@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { StarTrekApiResponse } from './types';
+import { ISearchTermProps, StarTrekApiResponse } from './types';
 
 export const bookApi = createApi({
   reducerPath: 'bookApi',
@@ -9,7 +9,17 @@ export const bookApi = createApi({
       query: ({ pageNumber, pageSize }) =>
         `book/search?pageNumber=${pageNumber}&pageSize=${pageSize}`,
     }),
+    searchTerm: builder.mutation<StarTrekApiResponse, ISearchTermProps>({
+      query: ({ pageNumber, pageSize, term }) => ({
+        url: `/book/search?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+        method: 'POST',
+        body: new URLSearchParams({ title: term }),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }),
+    }),
   }),
 });
 
-export const { useFetchAllBooksQuery } = bookApi;
+export const { useFetchAllBooksQuery, useSearchTermMutation } = bookApi;

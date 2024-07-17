@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { SearchBar } from '../../components/searchBar/searchBar';
 import { ListView } from '../../components/listView/listView';
 import { IMainPageState } from './types';
-import { useFetchAllBooksQuery } from '../../controllers/starTrekApi';
-import { searchTerm } from '../../controllers/searchTerm';
+import { useFetchAllBooksQuery, useSearchTermMutation } from '../../controllers/starTrekApi';
 import { Button } from '../../components/button/button';
 import { Pagination } from '../../components/pagination/paginationComponent';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
@@ -39,6 +38,8 @@ export const MainPage: React.FC = () => {
     pageSize: state.booksPerPage,
   });
 
+  const [searchTermRRR] = useSearchTermMutation();
+
   const handleSubmit = useCallback(
     async (term: string, page = 1) => {
       try {
@@ -55,8 +56,9 @@ export const MainPage: React.FC = () => {
         const pageSize = state.booksPerPage;
 
         if (term) {
-          const searchResult = await searchTerm(pageNumber, pageSize, term);
-          const { bookList, totalElements } = searchResult;
+          const searchResult = await searchTermRRR({ pageNumber, pageSize, term });
+          const bookList = searchResult.data?.books;
+          const totalElements = searchResult.data?.page.totalElements;
 
           if (bookList && totalElements && totalElements > 0) {
             setState((prevState) => ({
@@ -87,7 +89,7 @@ export const MainPage: React.FC = () => {
         }));
       }
     },
-    [navigate, state.booksPerPage],
+    [navigate, searchTermRRR, state.booksPerPage],
   );
 
   useEffect(() => {
