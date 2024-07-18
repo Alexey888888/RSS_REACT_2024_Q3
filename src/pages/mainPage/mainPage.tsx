@@ -19,7 +19,7 @@ export const MainPage: React.FC = () => {
 
   const { currentPageRRR, termRRR } = useSelector((state: RootState) => state.pagination);
 
-  const booksPerPage = 15;
+  const pageSize = 15;
 
   const [state, setState] = React.useState<IMainPageState>({
     bookList: [],
@@ -33,7 +33,7 @@ export const MainPage: React.FC = () => {
     isLoading: allBooksIsLoading,
   } = useFetchAllBooksQuery({
     pageNumber: currentPageRRR,
-    pageSize: booksPerPage,
+    pageSize,
   });
 
   const [searchTerm, { isLoading: searchTermIsLoading, isError: searchTermIsError }] =
@@ -41,53 +41,41 @@ export const MainPage: React.FC = () => {
 
   const handleSubmit = useCallback(
     async (term: string, page = 1) => {
-      try {
-        setState((prevState) => ({
-          ...prevState,
-          currentPage: page,
-          errorMessage: '',
-          bookList: [],
-          totalBooks: 0,
-        }));
-        dispatch(setTerm(term));
-        dispatch(setPage(page));
+      setState((prevState) => ({
+        ...prevState,
+        bookList: [],
+        totalBooks: 0,
+      }));
+      dispatch(setTerm(term));
 
-        const pageNumber = page - 1;
-        const pageSize = booksPerPage;
+      if (term) {
+        const searchResult = await searchTerm({ pageNumber: page - 1, pageSize, term });
+        const bookList = searchResult.data?.books;
+        const totalElements = searchResult.data?.page.totalElements;
 
-        if (term) {
-          const searchResult = await searchTerm({ pageNumber, pageSize, term });
-          const bookList = searchResult.data?.books;
-          const totalElements = searchResult.data?.page.totalElements;
-
-          if (bookList && totalElements && totalElements > 0) {
-            setState((prevState) => ({
-              ...prevState,
-              bookList,
-              totalBooks: totalElements,
-            }));
-          } else {
-            setState((prevState) => ({
-              ...prevState,
-              bookList: [],
-              totalBooks: 0,
-            }));
-          }
+        if (bookList && totalElements && totalElements > 0) {
+          setState((prevState) => ({
+            ...prevState,
+            bookList,
+            totalBooks: totalElements,
+          }));
         } else {
-          navigate(`?search=${term}&page=${page}`);
-          dispatch(setTerm(''));
-          if (allBooks) {
-            setState((prevState) => ({
-              ...prevState,
-              bookList: allBooks.books ?? [],
-              totalBooks: allBooks.page.totalElements ?? 0,
-            }));
-          }
+          setState((prevState) => ({
+            ...prevState,
+            bookList: [],
+            totalBooks: 0,
+          }));
         }
-      } catch (error) {
-        setState((prevState) => ({
-          ...prevState,
-        }));
+      } else {
+        navigate(`?search=${term}&page=${page}`);
+        dispatch(setTerm(''));
+        if (allBooks) {
+          setState((prevState) => ({
+            ...prevState,
+            bookList: allBooks.books ?? [],
+            totalBooks: allBooks.page.totalElements ?? 0,
+          }));
+        }
       }
     },
     [allBooks, dispatch, navigate, searchTerm],
@@ -104,17 +92,11 @@ export const MainPage: React.FC = () => {
             bookList: allBooks.books ?? [],
             totalBooks: allBooks.page.totalElements ?? 0,
           }));
-        } else if (allBooksError) {
-          setState((prevState) => ({
-            ...prevState,
-            errorMessage: 'Failed to fetch books.',
-          }));
         }
       } else {
         await handleSubmit(searchTerm, currentPageRRR);
       }
     };
-
     fetchBooks();
   }, [allBooks, allBooksError, handleSubmit, currentPageRRR, termRRR]);
 
@@ -160,7 +142,7 @@ export const MainPage: React.FC = () => {
               <>
                 <ListView bookList={state.bookList} onBookClick={handleBookClick} />
                 <Pagination
-                  booksPerPage={booksPerPage}
+                  booksPerPage={pageSize}
                   totalBooks={state.totalBooks}
                   currentPage={currentPageRRR}
                   onPageChange={handlePageChange}
