@@ -24,7 +24,6 @@ export const MainPage: React.FC = () => {
     bookList: [],
     errorMessage: '',
     term: term,
-    loading: false,
     currentPage: currentPage,
     booksPerPage: 15,
     totalBooks: 0,
@@ -57,7 +56,8 @@ export const MainPage: React.FC = () => {
         const pageNumber = page - 1;
         const pageSize = state.booksPerPage;
 
-        if (term) {
+        if (term && term !== state.term) {
+          console.log(term, `8${state.term}`);
           const searchResult = await searchTerm({ pageNumber, pageSize, term });
           const bookList = searchResult.data?.books;
           const totalElements = searchResult.data?.page.totalElements;
@@ -90,7 +90,7 @@ export const MainPage: React.FC = () => {
         }));
       }
     },
-    [dispatch, navigate, searchTerm, state.booksPerPage],
+    [dispatch, navigate, searchTerm, state.booksPerPage, state.term],
   );
 
   useEffect(() => {
@@ -181,9 +181,8 @@ export const MainPage: React.FC = () => {
         </header>
         <main className="main__wrapper">
           <div style={outletExists ? { width: '270px' } : {}}>
-            {state.loading && <p className="loading">Loading...</p>}
             {state.errorMessage && <p>{state.errorMessage}</p>}
-            {!state.loading && !state.errorMessage && (
+            {!state.errorMessage && (
               <>
                 <ListView bookList={state.bookList} onBookClick={handleBookClick} />
                 <Pagination

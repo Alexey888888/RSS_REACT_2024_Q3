@@ -30,7 +30,6 @@ export interface IMainPageState {
   bookList: IBook[];
   errorMessage: string;
   term: string;
-  loading: boolean;
   currentPage: number;
   booksPerPage: number;
   totalBooks: number;
