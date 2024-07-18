@@ -18,13 +18,13 @@ export const MainPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { currentPage, term } = useSelector((state: RootState) => state.pagination);
+  const { currentPageRRR, termRRR } = useSelector((state: RootState) => state.pagination);
 
   const [state, setState] = React.useState<IMainPageState>({
     bookList: [],
     errorMessage: '',
-    term: term,
-    currentPage: currentPage,
+    term: termRRR,
+    currentPage: currentPageRRR,
     booksPerPage: 15,
     totalBooks: 0,
     hasError: false,
@@ -46,18 +46,20 @@ export const MainPage: React.FC = () => {
       try {
         setState((prevState) => ({
           ...prevState,
-          loading: true,
           currentPage: page,
           term,
           errorMessage: '',
           bookList: [],
           totalBooks: 0,
         }));
+        dispatch(setTerm(term));
+        dispatch(setPage(page));
+
         const pageNumber = page - 1;
         const pageSize = state.booksPerPage;
 
-        if (term && term !== state.term) {
-          console.log(term, `8${state.term}`);
+        if (term) {
+          console.log(term, state.term);
           const searchResult = await searchTerm({ pageNumber, pageSize, term });
           const bookList = searchResult.data?.books;
           const totalElements = searchResult.data?.page.totalElements;
@@ -67,7 +69,6 @@ export const MainPage: React.FC = () => {
               ...prevState,
               bookList,
               totalBooks: totalElements,
-              loading: false,
             }));
           } else {
             setState((prevState) => ({
@@ -75,18 +76,16 @@ export const MainPage: React.FC = () => {
               bookList: [],
               totalBooks: 0,
               errorMessage: 'No books found for this term.',
-              loading: false,
             }));
           }
         } else {
-          navigate(`?search=&page=${page}`);
+          navigate(`?search=${term}&page=${page}`);
           dispatch(setTerm(''));
         }
       } catch (error) {
         setState((prevState) => ({
           ...prevState,
           errorMessage: 'Failed to fetch books.',
-          loading: false,
         }));
       }
     },
@@ -94,30 +93,22 @@ export const MainPage: React.FC = () => {
   );
 
   useEffect(() => {
-    const searchTerm = term || localStorage.getItem('searchTerm_888888');
+    const searchTerm = termRRR || localStorage.getItem('searchTerm_888888');
 
     const fetchBooks = async () => {
       try {
-        setState((prevState) => ({ ...prevState, loading: true }));
         if (!searchTerm) {
           if (allBooks) {
             setState((prevState) => ({
               ...prevState,
               bookList: allBooks.books ?? [],
               totalBooks: allBooks.page.totalElements ?? 0,
-              loading: allBooksIsLoading,
               errorMessage: allBooksError ? 'Failed to fetch books.' : '',
             }));
           } else if (allBooksError) {
             setState((prevState) => ({
               ...prevState,
               errorMessage: 'Failed to fetch books.',
-              loading: false,
-            }));
-          } else if (allBooksIsLoading) {
-            setState((prevState) => ({
-              ...prevState,
-              loading: true,
             }));
           }
         } else {
@@ -126,13 +117,11 @@ export const MainPage: React.FC = () => {
         }
       } catch (error) {
         setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
-      } finally {
-        setState((prevState) => ({ ...prevState, loading: false }));
       }
     };
 
     fetchBooks();
-  }, [allBooks, allBooksError, handleSubmit, allBooksIsLoading, state.currentPage, term]);
+  }, [allBooks, allBooksError, handleSubmit, allBooksIsLoading, state.currentPage, termRRR]);
 
   const handleErrorButtonClick = () => {
     setState((prevState) => ({ ...prevState, hasError: true }));
@@ -181,8 +170,9 @@ export const MainPage: React.FC = () => {
         </header>
         <main className="main__wrapper">
           <div style={outletExists ? { width: '270px' } : {}}>
+            {allBooksIsLoading && <p className="loading">Loading...</p>}
             {state.errorMessage && <p>{state.errorMessage}</p>}
-            {!state.errorMessage && (
+            {!allBooksIsLoading && !state.errorMessage && (
               <>
                 <ListView bookList={state.bookList} onBookClick={handleBookClick} />
                 <Pagination
