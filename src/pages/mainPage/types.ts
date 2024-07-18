@@ -28,7 +28,6 @@ export interface IBook {
 
 export interface IMainPageState {
   bookList: IBook[];
-  errorMessage: string;
   totalBooks: number;
   hasError: boolean;
 }
