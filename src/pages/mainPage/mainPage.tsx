@@ -16,7 +16,6 @@ import { IMainPageState } from './types';
 export const MainPage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { currentPageRRR, termRRR } = useSelector((state: RootState) => state.pagination);
 
@@ -46,7 +45,6 @@ export const MainPage: React.FC = () => {
         setState((prevState) => ({
           ...prevState,
           currentPage: page,
-          term,
           errorMessage: '',
           bookList: [],
           totalBooks: 0,
@@ -79,6 +77,14 @@ export const MainPage: React.FC = () => {
         } else {
           navigate(`?search=${term}&page=${page}`);
           dispatch(setTerm(''));
+          if (allBooks) {
+            setState((prevState) => ({
+              ...prevState,
+              bookList: allBooks.books ?? [],
+              totalBooks: allBooks.page.totalElements ?? 0,
+              errorMessage: allBooksError ? 'Failed to fetch books.' : '',
+            }));
+          }
         }
       } catch (error) {
         setState((prevState) => ({
@@ -87,7 +93,7 @@ export const MainPage: React.FC = () => {
         }));
       }
     },
-    [dispatch, navigate, searchTerm],
+    [allBooks, allBooksError, dispatch, navigate, searchTerm],
   );
 
   useEffect(() => {
@@ -124,17 +130,6 @@ export const MainPage: React.FC = () => {
   const handleErrorButtonClick = () => {
     setState((prevState) => ({ ...prevState, hasError: true }));
   };
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const newPage = parseInt(queryParams.get('page') || '1', 10);
-    const newSearch = queryParams.get('search') || '';
-    setState((prevState) => ({
-      ...prevState,
-      currentPage: newPage,
-      term: newSearch,
-    }));
-  }, [location.search]);
 
   const handleBookClick = (bookUid: string) => {
     dispatch(setSelectedItem(bookUid));
