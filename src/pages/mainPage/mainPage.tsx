@@ -20,12 +20,11 @@ export const MainPage: React.FC = () => {
 
   const { currentPageRRR, termRRR } = useSelector((state: RootState) => state.pagination);
 
+  const booksPerPage = 15;
+
   const [state, setState] = React.useState<IMainPageState>({
     bookList: [],
     errorMessage: '',
-    term: termRRR,
-    currentPage: currentPageRRR,
-    booksPerPage: 15,
     totalBooks: 0,
     hasError: false,
   });
@@ -35,8 +34,8 @@ export const MainPage: React.FC = () => {
     error: allBooksError,
     isLoading: allBooksIsLoading,
   } = useFetchAllBooksQuery({
-    pageNumber: state.currentPage - 1,
-    pageSize: state.booksPerPage,
+    pageNumber: currentPageRRR,
+    pageSize: booksPerPage,
   });
 
   const [searchTerm] = useSearchTermMutation();
@@ -56,10 +55,9 @@ export const MainPage: React.FC = () => {
         dispatch(setPage(page));
 
         const pageNumber = page - 1;
-        const pageSize = state.booksPerPage;
+        const pageSize = booksPerPage;
 
         if (term) {
-          console.log(term, state.term);
           const searchResult = await searchTerm({ pageNumber, pageSize, term });
           const bookList = searchResult.data?.books;
           const totalElements = searchResult.data?.page.totalElements;
@@ -89,7 +87,7 @@ export const MainPage: React.FC = () => {
         }));
       }
     },
-    [dispatch, navigate, searchTerm, state.booksPerPage, state.term],
+    [dispatch, navigate, searchTerm],
   );
 
   useEffect(() => {
@@ -113,7 +111,7 @@ export const MainPage: React.FC = () => {
           }
         } else {
           setState((prevState) => ({ ...prevState, term: searchTerm }));
-          await handleSubmit(searchTerm, state.currentPage);
+          await handleSubmit(searchTerm, currentPageRRR);
         }
       } catch (error) {
         setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
@@ -121,7 +119,7 @@ export const MainPage: React.FC = () => {
     };
 
     fetchBooks();
-  }, [allBooks, allBooksError, handleSubmit, allBooksIsLoading, state.currentPage, termRRR]);
+  }, [allBooks, allBooksError, handleSubmit, allBooksIsLoading, currentPageRRR, termRRR]);
 
   const handleErrorButtonClick = () => {
     setState((prevState) => ({ ...prevState, hasError: true }));
@@ -140,17 +138,17 @@ export const MainPage: React.FC = () => {
 
   const handleBookClick = (bookUid: string) => {
     dispatch(setSelectedItem(bookUid));
-    navigate(`/details/${bookUid}?search=${state.term}&page=${state.currentPage}`);
+    navigate(`/details/${bookUid}?search=${termRRR}&page=${currentPageRRR}`);
   };
 
   const handleCloseDetails = () => {
-    const queryParams = `?search=${state.term}&page=${state.currentPage}`;
+    const queryParams = `?search=${termRRR}&page=${currentPageRRR}`;
     navigate('/' + queryParams);
   };
 
   const handlePageChange = (page: number) => {
     dispatch(setPage(page));
-    navigate(`?search=${state.term}&page=${page}`);
+    navigate(`?search=${termRRR}&page=${page}`);
   };
 
   const outletExists = !!useLocation().pathname.includes('details');
@@ -162,7 +160,7 @@ export const MainPage: React.FC = () => {
       <div className="container">
         <header className="header">
           <div className="search-bar-container">
-            <SearchBar handleSubmit={handleSubmit} term={state.term} />
+            <SearchBar handleSubmit={handleSubmit} term={termRRR} />
           </div>
           <div className="error-button">
             <Button type="button" text="Test error" onClick={handleErrorButtonClick}></Button>
@@ -176,9 +174,9 @@ export const MainPage: React.FC = () => {
               <>
                 <ListView bookList={state.bookList} onBookClick={handleBookClick} />
                 <Pagination
-                  booksPerPage={state.booksPerPage}
+                  booksPerPage={booksPerPage}
                   totalBooks={state.totalBooks}
-                  currentPage={state.currentPage}
+                  currentPage={currentPageRRR}
                   onPageChange={handlePageChange}
                 />
               </>
