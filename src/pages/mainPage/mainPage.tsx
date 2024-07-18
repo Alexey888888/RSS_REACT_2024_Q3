@@ -16,10 +16,8 @@ import { IMainPageState } from './types';
 export const MainPage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const { currentPageRRR, termRRR } = useSelector((state: RootState) => state.pagination);
-
   const pageSize = 15;
+  const { currentPageRRR, termRRR } = useSelector((state: RootState) => state.pagination);
 
   const [state, setState] = React.useState<IMainPageState>({
     bookList: [],
@@ -47,6 +45,7 @@ export const MainPage: React.FC = () => {
         totalBooks: 0,
       }));
       dispatch(setTerm(term));
+      dispatch(setPage(page));
 
       if (term) {
         const searchResult = await searchTerm({ pageNumber: page - 1, pageSize, term });
@@ -59,6 +58,7 @@ export const MainPage: React.FC = () => {
             bookList,
             totalBooks: totalElements,
           }));
+          navigate(`?search=${term}&page=${page}`);
         } else {
           setState((prevState) => ({
             ...prevState,
@@ -67,7 +67,7 @@ export const MainPage: React.FC = () => {
           }));
         }
       } else {
-        navigate(`?search=${term}&page=${page}`);
+        navigate(`?search=&page=${page}`);
         dispatch(setTerm(''));
         if (allBooks) {
           setState((prevState) => ({
