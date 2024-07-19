@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface IPaginationState {
-  currentPageRRR: number;
-  termRRR: string;
+  currentPage: number;
+  term: string;
 }
 
 const getInitialState = (): IPaginationState => {
@@ -12,8 +12,8 @@ const getInitialState = (): IPaginationState => {
   const searchQueryParam = queryParams.get('search') || '';
 
   return {
-    currentPageRRR: pageQueryParam,
-    termRRR: searchQueryParam,
+    currentPage: pageQueryParam,
+    term: searchQueryParam,
   };
 };
 
@@ -24,10 +24,10 @@ const paginationSlice = createSlice({
   initialState,
   reducers: {
     setPage(state, action: PayloadAction<number>) {
-      state.currentPageRRR = action.payload;
+      state.currentPage = action.payload;
     },
     setTerm(state, action: PayloadAction<string>) {
-      state.termRRR = action.payload;
+      state.term = action.payload;
     },
   },
 });

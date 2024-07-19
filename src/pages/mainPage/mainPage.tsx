@@ -8,7 +8,7 @@ import { Pagination } from '../../components/pagination/paginationComponent';
 import { RootState } from '../../redux/store';
 import { useFetchAllBooksQuery, useSearchTermMutation } from '../../controllers/starTrekApi';
 import { setPage, setTerm } from '../../redux/slices/paginationSlice';
-import { setSelectedItem } from '../../redux/slices/selectedItemSlice';
+import { setSelectedItemDetails } from '../../redux/slices/selectedItemDetailsSlice';
 
 import './mainPage.scss';
 import { IMainPageState } from './types';
@@ -17,7 +17,7 @@ export const MainPage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const pageSize = 15;
-  const { currentPageRRR, termRRR } = useSelector((state: RootState) => state.pagination);
+  const { currentPage, term } = useSelector((state: RootState) => state.pagination);
 
   const [state, setState] = React.useState<IMainPageState>({
     bookList: [],
@@ -30,7 +30,7 @@ export const MainPage: React.FC = () => {
     error: allBooksError,
     isLoading: allBooksIsLoading,
   } = useFetchAllBooksQuery({
-    pageNumber: currentPageRRR,
+    pageNumber: currentPage,
     pageSize,
   });
 
@@ -82,7 +82,7 @@ export const MainPage: React.FC = () => {
   );
 
   useEffect(() => {
-    const searchTerm = termRRR || localStorage.getItem('searchTerm_888888');
+    const searchTerm = term || localStorage.getItem('searchTerm_888888');
 
     const fetchBooks = async () => {
       if (!searchTerm) {
@@ -94,29 +94,29 @@ export const MainPage: React.FC = () => {
           }));
         }
       } else {
-        await handleSubmit(searchTerm, currentPageRRR);
+        await handleSubmit(searchTerm, currentPage);
       }
     };
     fetchBooks();
-  }, [allBooks, allBooksError, handleSubmit, currentPageRRR, termRRR]);
+  }, [allBooks, allBooksError, handleSubmit, currentPage, term]);
 
   const handleErrorButtonClick = () => {
     setState((prevState) => ({ ...prevState, hasError: true }));
   };
 
   const handleBookClick = (bookUid: string) => {
-    dispatch(setSelectedItem(bookUid));
-    navigate(`/details/${bookUid}?search=${termRRR}&page=${currentPageRRR}`);
+    dispatch(setSelectedItemDetails(bookUid));
+    navigate(`/details/${bookUid}?search=${term}&page=${currentPage}`);
   };
 
   const handleCloseDetails = () => {
-    const queryParams = `?search=${termRRR}&page=${currentPageRRR}`;
+    const queryParams = `?search=${term}&page=${currentPage}`;
     navigate('/' + queryParams);
   };
 
   const handlePageChange = (page: number) => {
     dispatch(setPage(page));
-    navigate(`?search=${termRRR}&page=${page}`);
+    navigate(`?search=${term}&page=${page}`);
   };
 
   const outletExists = !!useLocation().pathname.includes('details');
@@ -128,7 +128,7 @@ export const MainPage: React.FC = () => {
       <div className="container">
         <header className="header">
           <div className="search-bar-container">
-            <SearchBar handleSubmit={handleSubmit} term={termRRR} />
+            <SearchBar handleSubmit={handleSubmit} term={term} />
           </div>
           <div className="error-button">
             <Button type="button" text="Test error" onClick={handleErrorButtonClick}></Button>
@@ -144,7 +144,7 @@ export const MainPage: React.FC = () => {
                 <Pagination
                   booksPerPage={pageSize}
                   totalBooks={state.totalBooks}
-                  currentPage={currentPageRRR}
+                  currentPage={currentPage}
                   onPageChange={handlePageChange}
                 />
               </>

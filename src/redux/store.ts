@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { bookApi } from '../controllers/starTrekApi';
 import paginationReducer from './slices/paginationSlice';
-import selectedItemReducer from './slices/selectedItemSlice';
+import selectedItemReducer from './slices/selectedItemDetailsSlice';
 
 export const store = configureStore({
   reducer: {

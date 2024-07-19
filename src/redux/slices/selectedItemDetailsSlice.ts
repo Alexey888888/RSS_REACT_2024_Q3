@@ -8,15 +8,15 @@ const initialState: ISelectedItemState = {
   selectedItemId: null,
 };
 
-const selectedItemSlice = createSlice({
+const selectedItemDetailsSlice = createSlice({
   name: 'selectedItem',
   initialState,
   reducers: {
-    setSelectedItem(state, action: PayloadAction<string | null>) {
+    setSelectedItemDetails(state, action: PayloadAction<string | null>) {
       state.selectedItemId = action.payload;
     },
   },
 });
 
-export const { setSelectedItem } = selectedItemSlice.actions;
-export default selectedItemSlice.reducer;
+export const { setSelectedItemDetails } = selectedItemDetailsSlice.actions;
+export default selectedItemDetailsSlice.reducer;
