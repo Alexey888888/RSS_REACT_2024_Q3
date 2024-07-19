@@ -1,3 +1,11 @@
+.container_light {
+  background: #7dc9e4;
+}
+
+.container_dark {
+  background: #333333;
+}
+
 .main-page {
   .header {
     display: flex;
@@ -9,7 +17,19 @@
       flex-direction: column-reverse;
     }
 
-    .search-bar-container {
+    .theme-selector__container {
+      padding-left: 30px;
+
+      @media (max-width: 980px) {
+        padding-left: 0;
+      }
+
+      @media (max-width: 620px) {
+        padding-top: 20px;
+      }
+    }
+
+    .search-bar__container {
       flex-grow: 1;
       display: flex;
       justify-content: center;

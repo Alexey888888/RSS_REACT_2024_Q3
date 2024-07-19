@@ -5,7 +5,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #cfcfcf;
+  background: #cfcfcf;
   padding: 10px;
   display: flex;
   justify-content: space-between;
@@ -14,4 +14,8 @@
   p {
     margin: 0;
   }
+}
+
+.flyout_dark {
+  background: #292929;
 }

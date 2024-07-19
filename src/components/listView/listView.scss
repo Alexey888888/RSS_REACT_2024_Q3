@@ -8,6 +8,11 @@
 
   input {
     cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      scale: 1.1;
+    }
   }
 
   @media (max-width: 980px) {

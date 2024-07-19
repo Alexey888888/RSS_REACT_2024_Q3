@@ -9,10 +9,12 @@ import { RootState } from '../../redux/store';
 import { useFetchAllBooksQuery, useSearchTermMutation } from '../../controllers/starTrekApi';
 import { setPage, setTerm } from '../../redux/slices/paginationSlice';
 import { setSelectedItemDetails } from '../../redux/slices/selectedItemDetailsSlice';
-
-import './mainPage.scss';
 import { IMainPageState } from './types';
 import { Flyout } from '../../components/flyout/flyout';
+import { ThemeSelector } from '../../components/themeSelector/themeSelector';
+import { useTheme } from '../../context/useTheme';
+
+import './mainPage.scss';
 
 export const MainPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -20,6 +22,7 @@ export const MainPage: React.FC = () => {
   const pageSize = 15;
   const { currentPage, term } = useSelector((state: RootState) => state.pagination);
   const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
+  const { theme } = useTheme();
 
   const [state, setState] = React.useState<IMainPageState>({
     bookList: [],
@@ -127,9 +130,12 @@ export const MainPage: React.FC = () => {
 
   return (
     <div className="main-page">
-      <div className="container">
+      <div className={`container ${theme === 'light' ? 'container_light' : 'container_dark'}`}>
         <header className="header">
-          <div className="search-bar-container">
+          <div className="theme-selector__container">
+            <ThemeSelector />
+          </div>
+          <div className="search-bar__container">
             <SearchBar handleSubmit={handleSubmit} term={term} />
           </div>
           <div className="error-button">
