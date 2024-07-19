@@ -1,7 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+interface Book {
+  uid: string;
+  title: string;
+  publishedYear: number;
+  numberOfPages: number;
+}
+
 export interface SelectedItemsState {
-  selectedItems: string[];
+  selectedItems: Book[];
 }
 
 const initialState: SelectedItemsState = {
@@ -12,13 +19,13 @@ const selectedItemsSlice = createSlice({
   name: 'selectedItems',
   initialState,
   reducers: {
-    addItem(state, action: PayloadAction<string>) {
+    addItem(state, action: PayloadAction<Book>) {
       state.selectedItems.push(action.payload);
     },
     removeItem(state, action: PayloadAction<string>) {
-      state.selectedItems = state.selectedItems.filter((item) => item !== action.payload);
+      state.selectedItems = state.selectedItems.filter((item) => item.uid !== action.payload);
     },
-    setSelectedItems(state, action: PayloadAction<string[]>) {
+    setSelectedItems(state, action: PayloadAction<Book[]>) {
       state.selectedItems = action.payload;
     },
   },

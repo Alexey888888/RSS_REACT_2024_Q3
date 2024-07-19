@@ -10,11 +10,19 @@ export const ListView: React.FC<IListView> = ({ bookList, onBookClick }) => {
   const dispatch = useDispatch();
   const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
 
-  const handleCheckboxChange = (uid: string, isChecked: boolean) => {
+  const handleCheckboxChange = (
+    book: {
+      uid: string;
+      title: string;
+      publishedYear: number;
+      numberOfPages: number;
+    },
+    isChecked: boolean,
+  ) => {
     if (isChecked) {
-      dispatch(addItem(uid));
+      dispatch(addItem(book));
     } else {
-      dispatch(removeItem(uid));
+      dispatch(removeItem(book.uid));
     }
   };
 
@@ -25,8 +33,18 @@ export const ListView: React.FC<IListView> = ({ bookList, onBookClick }) => {
           <li key={book.uid}>
             <input
               type="checkbox"
-              checked={selectedItems.includes(book.uid)}
-              onChange={(e) => handleCheckboxChange(book.uid, e.target.checked)}
+              checked={selectedItems.some((item) => item.uid === book.uid)}
+              onChange={(e) =>
+                handleCheckboxChange(
+                  {
+                    uid: book.uid,
+                    title: book.title,
+                    publishedYear: book.publishedYear,
+                    numberOfPages: book.numberOfPages,
+                  },
+                  e.target.checked,
+                )
+              }
             />
             <BookCard title={book.title} onClick={() => onBookClick(book.uid)} />
           </li>
