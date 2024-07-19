@@ -12,12 +12,14 @@ import { setSelectedItemDetails } from '../../redux/slices/selectedItemDetailsSl
 
 import './mainPage.scss';
 import { IMainPageState } from './types';
+import { Flyout } from '../../components/flyout/flyout';
 
 export const MainPage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const pageSize = 15;
   const { currentPage, term } = useSelector((state: RootState) => state.pagination);
+  const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
 
   const [state, setState] = React.useState<IMainPageState>({
     bookList: [],
@@ -153,6 +155,7 @@ export const MainPage: React.FC = () => {
           <Outlet context={{ handleCloseDetails }} />
         </main>
       </div>
+      {selectedItems.length > 0 && <Flyout />}
     </div>
   );
 };
