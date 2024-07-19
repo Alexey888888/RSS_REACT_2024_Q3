@@ -9,7 +9,7 @@ const initialState: ISelectedItemState = {
 };
 
 const selectedItemDetailsSlice = createSlice({
-  name: 'selectedItem',
+  name: 'selectedDetailItem',
   initialState,
   reducers: {
     setSelectedItemDetails(state, action: PayloadAction<string | null>) {
