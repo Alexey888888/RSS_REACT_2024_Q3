@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import { App } from './App';
 
 describe('index.tsx', () => {
   it('renders without crashing', () => {
