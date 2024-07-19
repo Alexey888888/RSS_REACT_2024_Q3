@@ -3,6 +3,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { Button } from './button';
 import { IButtonProps } from './IButton';
 
+vi.mock('../../context/useTheme', () => ({
+  useTheme: () => ({ theme: 'light' }),
+}));
+
 describe('Button component', () => {
   it('renders button with text', () => {
     const props: IButtonProps = {
