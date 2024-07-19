@@ -38,13 +38,13 @@ export const Details: React.FC = () => {
             </ul>
           </li>
         )}
-        {book?.publishedYear && book?.authors.length > 0 && (
+        {book?.publishedYear && (
           <li>
             <b>Published year: </b>
             {book?.publishedYear}
           </li>
         )}
-        {book?.numberOfPages && book?.authors.length > 0 && (
+        {book?.numberOfPages && (
           <li>
             <b>Number of pages: </b>
             {book?.numberOfPages}
