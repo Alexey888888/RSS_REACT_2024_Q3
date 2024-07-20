@@ -18,4 +18,18 @@ describe('MainPage Component', () => {
     );
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
+
+  it('should render correctly', () => {
+    render(
+      <Provider store={store}>
+        <ThemeProvider>
+          <Router>
+            <MainPage />
+          </Router>
+        </ThemeProvider>
+      </Provider>,
+    );
+    expect(screen.getByRole('button', { name: /Test error/i })).toBeInTheDocument();
+    expect(screen.getByText(/Loading.../)).toBeInTheDocument();
+  });
 });

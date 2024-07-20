@@ -80,9 +80,9 @@ const mockBooks: IBook[] = [
 ];
 
 describe('ListView Component', () => {
-  const renderWithProviders = (ui: React.ReactElement) => {
+  const renderWithProviders = (ui: React.ReactElement, store = mockStore) => {
     return render(
-      <Provider store={mockStore}>
+      <Provider store={store}>
         <ThemeProvider>
           <Router>{ui}</Router>
         </ThemeProvider>
@@ -106,5 +106,29 @@ describe('ListView Component', () => {
     const bookCard = screen.getByText('Book One');
     fireEvent.click(bookCard);
     expect(onBookClickMock).toHaveBeenCalledWith('1');
+  });
+
+  it('checks if the checkbox reflects the selection state', () => {
+    const store = configureStore({
+      reducer: {
+        pagination: paginationReducer,
+        selectedItemDetails: selectedItemDetailsReducer,
+        selectedItems: selectedItemsReducer,
+        [bookApi.reducerPath]: bookApi.reducer,
+      },
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(bookApi.middleware),
+      preloadedState: {
+        selectedItems: {
+          selectedItems: [mockBooks[0]],
+        },
+      },
+    });
+
+    renderWithProviders(<ListView bookList={mockBooks} onBookClick={vi.fn()} />, store);
+    const checkboxes = screen.getAllByRole('checkbox');
+    const checkboxOne = checkboxes[0];
+    const checkboxTwo = checkboxes[1];
+    expect(checkboxOne).toBeChecked();
+    expect(checkboxTwo).not.toBeChecked();
   });
 });
