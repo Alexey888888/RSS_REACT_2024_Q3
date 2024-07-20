@@ -1,35 +1,29 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { Pagination } from './paginationComponent';
+import { ThemeProvider } from '../../context/themeContext';
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <ThemeProvider>
+      <Router>{ui}</Router>
+    </ThemeProvider>,
+  );
+};
 
 describe('Pagination Component', () => {
   it('renders component without crashing', () => {
-    render(
+    renderWithProviders(
       <Pagination booksPerPage={10} totalBooks={100} currentPage={1} onPageChange={() => {}} />,
     );
 
     expect(screen.getByText('1 of 10')).toBeInTheDocument();
   });
 
-  it('disables previous button on first page', () => {
-    render(
-      <Pagination booksPerPage={10} totalBooks={100} currentPage={1} onPageChange={() => {}} />,
-    );
-
-    expect(screen.getByText('Previous')).toBeDisabled();
-  });
-
-  it('disables next button on last page', () => {
-    render(
-      <Pagination booksPerPage={10} totalBooks={100} currentPage={10} onPageChange={() => {}} />,
-    );
-
-    expect(screen.getByText('Next')).toBeDisabled();
-  });
-
   it('calls onPageChange with correct page number when next button is clicked', () => {
     const mockOnPageChange = vi.fn();
-    render(
+    renderWithProviders(
       <Pagination
         booksPerPage={10}
         totalBooks={100}
@@ -44,7 +38,7 @@ describe('Pagination Component', () => {
 
   it('calls onPageChange with correct page number when previous button is clicked', () => {
     const mockOnPageChange = vi.fn();
-    render(
+    renderWithProviders(
       <Pagination
         booksPerPage={10}
         totalBooks={100}

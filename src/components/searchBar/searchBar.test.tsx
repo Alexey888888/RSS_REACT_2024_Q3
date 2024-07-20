@@ -1,16 +1,26 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { SearchBar } from './searchBar';
+import { ThemeProvider } from '../../context/themeContext';
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <ThemeProvider>
+      <Router>{ui}</Router>
+    </ThemeProvider>,
+  );
+};
 
 describe('SearchBar Component', () => {
   it('renders component without crashing', () => {
-    render(<SearchBar term="" handleSubmit={() => {}} />);
+    renderWithProviders(<SearchBar term="" handleSubmit={() => {}} />);
     expect(screen.getByText('Search for a Star Trek books')).toBeInTheDocument();
   });
 
   it('calls handleSubmit with the correct search term', () => {
     const mockHandleSubmit = vi.fn();
-    render(<SearchBar term="initial term" handleSubmit={mockHandleSubmit} />);
+    renderWithProviders(<SearchBar term="initial term" handleSubmit={mockHandleSubmit} />);
 
     const inputElement = screen.getByRole('textbox');
     fireEvent.change(inputElement, { target: { value: 'new term' } });
