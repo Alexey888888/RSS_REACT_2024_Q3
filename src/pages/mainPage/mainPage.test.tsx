@@ -18,4 +18,43 @@ describe('MainPage Component', () => {
     );
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
+
+  it('should render ThemeSelector', () => {
+    const { getByText } = render(
+      <Provider store={store}>
+        <Router>
+          <ThemeProvider>
+            <MainPage />
+          </ThemeProvider>
+        </Router>
+      </Provider>,
+    );
+    expect(getByText('Select theme:')).toBeInTheDocument();
+  });
+
+  it('should render SearchBar', () => {
+    const { getByText } = render(
+      <Provider store={store}>
+        <Router>
+          <ThemeProvider>
+            <MainPage />
+          </ThemeProvider>
+        </Router>
+      </Provider>,
+    );
+    expect(getByText('Search')).toBeInTheDocument();
+  });
+
+  it('should render TestError', () => {
+    const { getByText } = render(
+      <Provider store={store}>
+        <Router>
+          <ThemeProvider>
+            <MainPage />
+          </ThemeProvider>
+        </Router>
+      </Provider>,
+    );
+    expect(getByText('Test error')).toBeInTheDocument();
+  });
 });
