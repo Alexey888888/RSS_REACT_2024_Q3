@@ -8,7 +8,7 @@ interface Book {
 }
 
 export interface SelectedItemsState {
-  selectedItems: Book[];
+  selectedItems: Book[] | null;
 }
 
 const initialState: SelectedItemsState = {
@@ -20,10 +20,11 @@ const selectedItemsSlice = createSlice({
   initialState,
   reducers: {
     addItem(state, action: PayloadAction<Book>) {
-      state.selectedItems.push(action.payload);
+      if (state.selectedItems) state.selectedItems.push(action.payload);
     },
     removeItem(state, action: PayloadAction<string>) {
-      state.selectedItems = state.selectedItems.filter((item) => item.uid !== action.payload);
+      if (state.selectedItems)
+        state.selectedItems = state.selectedItems.filter((item) => item.uid !== action.payload);
     },
     setSelectedItems(state, action: PayloadAction<Book[]>) {
       state.selectedItems = action.payload;
