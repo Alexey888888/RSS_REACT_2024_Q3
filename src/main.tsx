@@ -11,10 +11,12 @@ import './index.scss';
 const savedSelectedItems = loadSelectedItems();
 store.dispatch(setSelectedItems(savedSelectedItems));
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </React.StrictMode>,
-);
+export const renderApp = () => {
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </React.StrictMode>,
+  );
+};

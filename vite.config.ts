@@ -10,13 +10,6 @@ export default defineConfig({
     setupFiles: './src/setupTests.ts',
     coverage: {
       provider: 'v8',
-      exclude: [
-        'src/main.tsx',
-        'node_modules',
-        '**/dist/**', 
-        '**/.eslintrc.cjs', 
-        '**/vite.config.ts'],
-    },
-   
+     },   
   },
 });
