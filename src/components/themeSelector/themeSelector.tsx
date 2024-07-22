@@ -10,8 +10,8 @@ export const ThemeSelector: React.FC = () => {
 
   return (
     <div>
-      <label>Select theme: </label>
-      <select value={theme} onChange={handleChange}>
+      <label htmlFor="theme-select">Select theme: </label>
+      <select id="theme-select" value={theme} onChange={handleChange}>
         <option value="light">Light</option>
         <option value="dark">Dark</option>
       </select>
