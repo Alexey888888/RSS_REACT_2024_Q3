@@ -105,6 +105,15 @@ export const MainPage: React.FC = () => {
     fetchBooks();
   }, [allBooks, allBooksError, handleSubmit, currentPage, term]);
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const searchTerm = searchParams.get('search') || '';
+    const page = parseInt(searchParams.get('page') || '1', 10);
+
+    dispatch(setTerm(searchTerm));
+    dispatch(setPage(page));
+  });
+
   const handleErrorButtonClick = () => {
     setState((prevState) => ({ ...prevState, hasError: true }));
   };
