@@ -19,6 +19,7 @@ import './mainPage.scss';
 export const MainPage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const pageSize = 15;
   const { currentPage, term } = useSelector((state: RootState) => state.pagination);
   const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
@@ -63,7 +64,7 @@ export const MainPage: React.FC = () => {
             bookList,
             totalBooks: totalElements,
           }));
-          navigate(`?search=${term}&page=${page}`);
+          navigate(`?search=${term}&page=${page}`, { replace: false });
         } else {
           setState((prevState) => ({
             ...prevState,
@@ -72,7 +73,7 @@ export const MainPage: React.FC = () => {
           }));
         }
       } else {
-        navigate(`?search=&page=${page}`);
+        navigate(`?search=&page=${page}`, { replace: false });
         dispatch(setTerm(''));
         if (allBooks) {
           setState((prevState) => ({
@@ -87,7 +88,12 @@ export const MainPage: React.FC = () => {
   );
 
   useEffect(() => {
-    const searchTerm = term || localStorage.getItem('searchTerm_888888');
+    const searchParams = new URLSearchParams(location.search);
+    const searchTerm = searchParams.get('search') || '';
+    const page = parseInt(searchParams.get('page') || '1', 10);
+
+    dispatch(setTerm(searchTerm));
+    dispatch(setPage(page));
 
     const fetchBooks = async () => {
       if (!searchTerm) {
@@ -99,20 +105,11 @@ export const MainPage: React.FC = () => {
           }));
         }
       } else {
-        await handleSubmit(searchTerm, currentPage);
+        await handleSubmit(searchTerm, page);
       }
     };
     fetchBooks();
-  }, [allBooks, allBooksError, handleSubmit, currentPage, term]);
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const searchTerm = searchParams.get('search') || '';
-    const page = parseInt(searchParams.get('page') || '1', 10);
-
-    dispatch(setTerm(searchTerm));
-    dispatch(setPage(page));
-  });
+  }, [location.search, allBooks, dispatch, handleSubmit]);
 
   const handleErrorButtonClick = () => {
     setState((prevState) => ({ ...prevState, hasError: true }));
@@ -130,7 +127,7 @@ export const MainPage: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     dispatch(setPage(page));
-    navigate(`?search=${term}&page=${page}`);
+    navigate(`?search=${term}&page=${page}`, { replace: false });
   };
 
   const outletExists = !!useLocation().pathname.includes('details');
