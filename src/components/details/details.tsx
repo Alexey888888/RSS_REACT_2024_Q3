@@ -24,7 +24,7 @@ export const Details: React.FC = () => {
   const book = bookDetails?.book;
 
   return (
-    <div className="details">
+    <div className="details" data-testid="details-container">
       <Button type="button" text="Close" onClick={handleCloseDetails} />
       <h3>Title: {book?.title}</h3>
       <ul className="book-detail__list">
