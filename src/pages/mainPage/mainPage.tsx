@@ -89,7 +89,8 @@ export const MainPage: React.FC = () => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const searchTerm = searchParams.get('search') || '';
+    const searchTerm =
+      searchParams.get('search') || localStorage.getItem('searchTerm_888888') || '';
     const page = parseInt(searchParams.get('page') || '1', 10);
 
     dispatch(setTerm(searchTerm));
@@ -154,6 +155,9 @@ export const MainPage: React.FC = () => {
             {(allBooksError || searchTermIsError) && <p>Failed to fetch books.</p>}
             {!allBooksIsLoading && !allBooksError && !searchTermIsError && (
               <>
+                {state.bookList.length === 0 && !allBooksIsLoading && !searchTermIsLoading && (
+                  <p>No books found for this term.</p>
+                )}
                 <ListView bookList={state.bookList} onBookClick={handleBookClick} />
                 {!allBooksIsLoading && !searchTermIsLoading && (
                   <Pagination
