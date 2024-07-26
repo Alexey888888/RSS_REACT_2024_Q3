@@ -6,9 +6,19 @@
   &:hover {
     scale: 1.05;
   }
+
+  &:disabled {
+    scale: 1;
+    cursor: default;
+  }
 }
 
 .button_dark {
   color: #ffffff;
-  background-color: #242424;
+  background: #242424;
+
+  &:disabled {
+    background: #8b8b8b;
+    color: #b0b0b0;
+  }
 }

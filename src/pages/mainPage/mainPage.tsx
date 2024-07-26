@@ -155,12 +155,14 @@ export const MainPage: React.FC = () => {
             {!allBooksIsLoading && !allBooksError && !searchTermIsError && (
               <>
                 <ListView bookList={state.bookList} onBookClick={handleBookClick} />
-                <Pagination
-                  booksPerPage={pageSize}
-                  totalBooks={state.totalBooks}
-                  currentPage={currentPage}
-                  onPageChange={handlePageChange}
-                />
+                {!allBooksIsLoading && !searchTermIsLoading && (
+                  <Pagination
+                    booksPerPage={pageSize}
+                    totalBooks={state.totalBooks}
+                    currentPage={currentPage}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </>
             )}
           </div>

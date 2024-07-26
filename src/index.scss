@@ -1,4 +1,9 @@
+body {
+  background: #bababa;
+}
+
 .container {
+  min-height: 100vh;
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 40px;
