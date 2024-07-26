@@ -22,4 +22,12 @@ describe('Input Component', () => {
     render(<Input type="text" value="test value" onChange={() => {}} />);
     expect(screen.getByRole('textbox')).toHaveValue('test value');
   });
+
+  it('renders correctly with given props', () => {
+    render(<Input type="text" value="test value" onChange={vi.fn()} />);
+    const inputElement = screen.getByRole('textbox');
+    expect(inputElement).toBeInTheDocument();
+    expect(inputElement).toHaveAttribute('type', 'text');
+    expect(inputElement).toHaveValue('test value');
+  });
 });

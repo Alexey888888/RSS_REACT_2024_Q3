@@ -6,6 +6,27 @@ export interface IFetchBooks {
   error?: string;
 }
 
+interface PageInfo {
+  firstPage: boolean;
+  lastPage: boolean;
+  numberOfElements: number;
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface StarTrekApiResponse {
+  page: PageInfo;
+  books?: IBook[];
+}
+
+export interface ISearchTermProps {
+  pageNumber: number;
+  pageSize: number;
+  term: string;
+}
+
 export interface IAuthor {
   uid: string;
   name: string;

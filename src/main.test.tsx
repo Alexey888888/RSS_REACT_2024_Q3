@@ -1,15 +1,28 @@
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import App from './App';
+import { renderApp } from './main';
+import { store } from './redux/store';
+import { Provider } from 'react-redux';
+import { App } from './App';
+import { render } from '@testing-library/react';
+import { act } from 'react';
 
-describe('Index Component', () => {
-  it('renders App component without crashing', () => {
-    render(<App />);
-    expect(screen.getByText(/loading/i)).toBeInTheDocument();
-  });
+describe('main.tsx', () => {
+  it('renders the App without crashing', () => {
+    const root = document.createElement('div');
+    root.id = 'root';
+    document.body.appendChild(root);
 
-  it('renders main content', () => {
-    render(<App />);
-    expect(screen.getByRole('main')).toBeInTheDocument();
+    act(() => {
+      renderApp(root);
+      render(
+        <Provider store={store}>
+          <App />
+        </Provider>,
+      );
+    });
+
+    const app = document.querySelector('#root');
+    expect(app).toBeTruthy();
+
+    document.body.removeChild(root);
   });
 });

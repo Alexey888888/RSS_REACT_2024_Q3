@@ -8,7 +8,14 @@ const mockBook = {
 
 describe('BookCard Component', () => {
   it('renders the title correctly', () => {
-    render(<BookCard title={mockBook.title} />);
+    render(
+      <BookCard
+        title={mockBook.title}
+        onClick={function (): void {
+          throw new Error('Function not implemented.');
+        }}
+      />,
+    );
     const titleElement = screen.getByText(mockBook.title);
     expect(titleElement).toBeInTheDocument();
   });

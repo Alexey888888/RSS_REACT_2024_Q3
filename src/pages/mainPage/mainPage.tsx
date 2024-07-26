@@ -1,154 +1,134 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { SearchBar } from '../../components/searchBar/searchBar';
 import { ListView } from '../../components/listView/listView';
-import { IMainPageState } from './types';
-import { fetchBookList } from '../../controllers/fetchBookList';
-import { searchTerm } from '../../controllers/searchTerm';
 import { Button } from '../../components/button/button';
 import { Pagination } from '../../components/pagination/paginationComponent';
-import { useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { RootState } from '../../redux/store';
+import { useFetchAllBooksQuery, useSearchTermMutation } from '../../controllers/starTrekApi';
+import { setPage, setTerm } from '../../redux/slices/paginationSlice';
+import { setSelectedItemDetails } from '../../redux/slices/selectedItemDetailsSlice';
+import { IMainPageState } from './types';
+import { Flyout } from '../../components/flyout/flyout';
+import { ThemeSelector } from '../../components/themeSelector/themeSelector';
+import { useTheme } from '../../context/useTheme';
 
 import './mainPage.scss';
 
 export const MainPage: React.FC = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const pageQueryParam = parseInt(queryParams.get('page') || '1', 10);
-  const searchQueryParam = queryParams.get('search') || '';
+  const pageSize = 15;
+  const { currentPage, term } = useSelector((state: RootState) => state.pagination);
+  const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
+  const { theme } = useTheme();
 
-  const [state, setState] = useState<IMainPageState>({
+  const [state, setState] = React.useState<IMainPageState>({
     bookList: [],
-    errorMessage: '',
-    term: searchQueryParam,
-    loading: false,
-    currentPage: pageQueryParam,
-    booksPerPage: 15,
     totalBooks: 0,
     hasError: false,
   });
 
-  const [shouldFetch, setShouldFetch] = useState(false);
+  const {
+    data: allBooks,
+    error: allBooksError,
+    isLoading: allBooksIsLoading,
+  } = useFetchAllBooksQuery({
+    pageNumber: currentPage,
+    pageSize,
+  });
 
-  const getAllBooks = useCallback(
-    async (page = 1) => {
-      try {
-        setState((prevState) => ({ ...prevState, loading: true, currentPage: page }));
-        const pageNumber = page - 1;
-        const pageSize = state.booksPerPage;
-        const response = await fetchBookList(pageNumber, pageSize);
-        const { error, bookList, totalElements } = response;
-        if (error) {
-          setState((prevState) => ({ ...prevState, errorMessage: error }));
-        } else if (bookList && totalElements) {
-          setState((prevState) => ({ ...prevState, bookList, totalBooks: totalElements }));
-        }
-      } catch (error) {
-        setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
-      } finally {
-        setState((prevState) => ({ ...prevState, loading: false }));
-      }
-    },
-    [state.booksPerPage],
-  );
+  const [searchTerm, { isLoading: searchTermIsLoading, isError: searchTermIsError }] =
+    useSearchTermMutation();
 
   const handleSubmit = useCallback(
     async (term: string, page = 1) => {
-      try {
-        setState((prevState) => ({
-          ...prevState,
-          loading: true,
-          currentPage: page,
-          term,
-          errorMessage: '',
-          bookList: [],
-          totalBooks: 0,
-        }));
-        const pageNumber = page - 1;
-        const pageSize = state.booksPerPage;
+      setState((prevState) => ({
+        ...prevState,
+        bookList: [],
+        totalBooks: 0,
+      }));
+      dispatch(setTerm(term));
+      dispatch(setPage(page));
 
-        if (term) {
-          const searchResult = await searchTerm(pageNumber, pageSize, term);
-          const { bookList, totalElements } = searchResult;
+      if (term) {
+        const searchResult = await searchTerm({ pageNumber: page - 1, pageSize, term });
+        const bookList = searchResult.data?.books;
+        const totalElements = searchResult.data?.page.totalElements;
 
-          if (bookList && totalElements && totalElements > 0) {
-            setState((prevState) => ({ ...prevState, bookList, totalBooks: totalElements }));
-          } else {
-            setState((prevState) => ({
-              ...prevState,
-              bookList: [],
-              totalBooks: 0,
-              errorMessage: 'No books found for this term.',
-            }));
-          }
+        if (bookList && totalElements && totalElements > 0) {
+          setState((prevState) => ({
+            ...prevState,
+            bookList,
+            totalBooks: totalElements,
+          }));
+          navigate(`?search=${term}&page=${page}`, { replace: false });
         } else {
-          getAllBooks(page);
+          setState((prevState) => ({
+            ...prevState,
+            bookList: [],
+            totalBooks: 0,
+          }));
         }
-      } catch (error) {
-        setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
-      } finally {
-        setState((prevState) => ({ ...prevState, loading: false }));
-        navigate(`?search=${term}&page=${page}`, { replace: true });
+      } else {
+        navigate(`?search=&page=${page}`, { replace: false });
+        dispatch(setTerm(''));
+        if (allBooks) {
+          setState((prevState) => ({
+            ...prevState,
+            bookList: allBooks.books ?? [],
+            totalBooks: allBooks.page.totalElements ?? 0,
+          }));
+        }
       }
     },
-    [getAllBooks, navigate, state.booksPerPage],
+    [allBooks, dispatch, navigate, searchTerm],
   );
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const searchTerm =
+      searchParams.get('search') || localStorage.getItem('searchTerm_888888') || '';
+    const page = parseInt(searchParams.get('page') || '1', 10);
+
+    dispatch(setTerm(searchTerm));
+    dispatch(setPage(page));
+
+    const fetchBooks = async () => {
+      if (!searchTerm) {
+        if (allBooks) {
+          setState((prevState) => ({
+            ...prevState,
+            bookList: allBooks.books ?? [],
+            totalBooks: allBooks.page.totalElements ?? 0,
+          }));
+        }
+      } else {
+        await handleSubmit(searchTerm, page);
+      }
+    };
+    fetchBooks();
+  }, [location.search, allBooks, dispatch, handleSubmit]);
 
   const handleErrorButtonClick = () => {
     setState((prevState) => ({ ...prevState, hasError: true }));
   };
 
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const newPage = parseInt(queryParams.get('page') || '1', 10);
-    const newSearch = queryParams.get('search') || '';
-
-    setState((prevState) => ({
-      ...prevState,
-      currentPage: newPage,
-      term: newSearch,
-    }));
-    setShouldFetch(true);
-  }, [location.search]);
-
-  useEffect(() => {
-    if (!shouldFetch) return;
-
-    const searchTerm = state.term || localStorage.getItem('searchTerm_888888');
-
-    const fetchBooks = async () => {
-      try {
-        setState((prevState) => ({ ...prevState, loading: true }));
-        if (!searchTerm) {
-          await getAllBooks(state.currentPage);
-        } else {
-          setState((prevState) => ({ ...prevState, term: searchTerm }));
-          await handleSubmit(searchTerm, state.currentPage);
-        }
-      } catch (error) {
-        setState((prevState) => ({ ...prevState, errorMessage: 'Failed to fetch books.' }));
-      } finally {
-        setState((prevState) => ({ ...prevState, loading: false }));
-      }
-    };
-
-    fetchBooks();
-
-    setShouldFetch(false);
-  }, [handleSubmit, getAllBooks, state.currentPage, state.term, shouldFetch]);
-
   const handleBookClick = (bookUid: string) => {
-    navigate(`/details/${bookUid}?search=${state.term}&page=${state.currentPage}`);
+    dispatch(setSelectedItemDetails(bookUid));
+    navigate(`/details/${bookUid}?search=${term}&page=${currentPage}`);
   };
 
   const handleCloseDetails = () => {
-    const queryParams = `?search=${state.term}&page=${state.currentPage}`;
+    const queryParams = `?search=${term}&page=${currentPage}`;
     navigate('/' + queryParams);
   };
 
   const handlePageChange = (page: number) => {
-    setState((prevState) => ({ ...prevState, currentPage: page }));
-    navigate(`?search=${state.term}&page=${page}`);
+    dispatch(setPage(page));
+    navigate(`?search=${term}&page=${page}`, { replace: false });
   };
 
   const outletExists = !!useLocation().pathname.includes('details');
@@ -157,10 +137,13 @@ export const MainPage: React.FC = () => {
 
   return (
     <div className="main-page">
-      <div className="container">
+      <div className={`container ${theme === 'light' ? 'container_light' : 'container_dark'}`}>
         <header className="header">
-          <div className="search-bar-container">
-            <SearchBar handleSubmit={handleSubmit} term={state.term} />
+          <div className="theme-selector__container">
+            <ThemeSelector />
+          </div>
+          <div className="search-bar__container">
+            <SearchBar handleSubmit={handleSubmit} term={term} />
           </div>
           <div className="error-button">
             <Button type="button" text="Test error" onClick={handleErrorButtonClick}></Button>
@@ -168,23 +151,29 @@ export const MainPage: React.FC = () => {
         </header>
         <main className="main__wrapper">
           <div style={outletExists ? { width: '270px' } : {}}>
-            {state.loading && <p className="loading">Loading...</p>}
-            {state.errorMessage && <p>{state.errorMessage}</p>}
-            {!state.loading && !state.errorMessage && (
+            {(allBooksIsLoading || searchTermIsLoading) && <p className="loading">Loading...</p>}
+            {(allBooksError || searchTermIsError) && <p>Failed to fetch books.</p>}
+            {!allBooksIsLoading && !allBooksError && !searchTermIsError && (
               <>
+                {state.bookList.length === 0 && !allBooksIsLoading && !searchTermIsLoading && (
+                  <p>No books found for this term.</p>
+                )}
                 <ListView bookList={state.bookList} onBookClick={handleBookClick} />
-                <Pagination
-                  booksPerPage={state.booksPerPage}
-                  totalBooks={state.totalBooks}
-                  currentPage={state.currentPage}
-                  onPageChange={handlePageChange}
-                />
+                {!allBooksIsLoading && !searchTermIsLoading && (
+                  <Pagination
+                    booksPerPage={pageSize}
+                    totalBooks={state.totalBooks}
+                    currentPage={currentPage}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </>
             )}
           </div>
           <Outlet context={{ handleCloseDetails }} />
         </main>
       </div>
+      {selectedItems.length > 0 && <Flyout />}
     </div>
   );
 };
