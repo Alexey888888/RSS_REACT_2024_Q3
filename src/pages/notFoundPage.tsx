@@ -1,11 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
-import '../styles/notFoundPage.scss';
-
+import styles from '../styles/notFoundPage.module.scss';
 const NotFoundPage: React.FC = () => {
   return (
-    <div className="not-found-page">
-      <h1 className="not-found-page__title">
+    <div className={styles.notFoundPage}>
+      <h1>
         404
         <br />
         Page not found
