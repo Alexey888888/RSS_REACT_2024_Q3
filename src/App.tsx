@@ -17,7 +17,7 @@ const AppContent: React.FC<AppContentProps> = ({ children }) => {
   return <div className={theme === 'light' ? 'light-theme' : 'dark-theme'}>{children}</div>;
 };
 
-export function App() {
+export default function App() {
   return (
     <ThemeProvider>
       <Router>
