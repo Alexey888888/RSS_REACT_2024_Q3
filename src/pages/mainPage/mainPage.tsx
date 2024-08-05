@@ -9,14 +9,14 @@ import { RootState } from '../../redux/store';
 import { useFetchAllBooksQuery, useSearchTermMutation } from '../../controllers/starTrekApi';
 import { setPage, setTerm } from '../../redux/slices/paginationSlice';
 import { setSelectedItemDetails } from '../../redux/slices/selectedItemDetailsSlice';
-import { IMainPageState } from './types';
+import { IMainPageState } from '../../interfaces/types';
 import { Flyout } from '../../components/flyout/flyout';
 import { ThemeSelector } from '../../components/themeSelector/themeSelector';
 import { useTheme } from '../../context/useTheme';
 
 import './mainPage.scss';
 
-export const MainPage: React.FC = () => {
+const MainPage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -177,3 +177,5 @@ export const MainPage: React.FC = () => {
     </div>
   );
 };
+
+export default MainPage;

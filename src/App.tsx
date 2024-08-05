@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ErrorBoundary } from './components/errorBoundary/errorBoundary';
-import { MainPage } from './pages/mainPage/mainPage';
-import { NotFoundPage } from './pages/notFondPage/notFoundPage';
+import MainPage from './pages/mainPage/mainPage';
+import NotFoundPage from './pages/notFondPage/notFoundPage';
 import { Details } from './components/details/details';
 import { ThemeProvider } from './context/themeContext';
 import { useTheme } from './context/useTheme';

@@ -1,4 +1,4 @@
-export interface IBook {
+export default interface IBook {
   uid: string;
   title: string;
   publishedYear: number;

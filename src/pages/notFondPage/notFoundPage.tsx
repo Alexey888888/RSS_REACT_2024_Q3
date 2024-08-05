@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 import './notFoundPage.scss';
 
-export const NotFoundPage: React.FC = () => {
+const NotFoundPage: React.FC = () => {
   return (
     <div className="not-found-page">
       <h1 className="not-found-page__title">
@@ -16,3 +16,5 @@ export const NotFoundPage: React.FC = () => {
     </div>
   );
 };
+
+export default NotFoundPage;
