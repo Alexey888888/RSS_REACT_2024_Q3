@@ -6,7 +6,7 @@ import { Button } from '../button/button';
 import { CSVLink } from 'react-csv';
 import { useTheme } from '../../context/useTheme';
 
-import './flyout.scss';
+import styles from './flyout.module.scss';
 
 export const Flyout: React.FC = () => {
   const dispatch = useDispatch();
@@ -28,7 +28,9 @@ export const Flyout: React.FC = () => {
   };
 
   return (
-    <div className={`flyout ${theme === 'light' ? 'flyout_light' : 'flyout_dark'}`}>
+    <div
+      className={`${styles.flyout} ${theme === 'light' ? styles.flyout_light : styles.flyout_dark}`}
+    >
       <p>
         {selectedItems.length === 1
           ? '1 item is selected'

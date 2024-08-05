@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { IPaginationProps } from './IPagination';
 
-import './pagination.scss';
+import styles from './pagination.module.scss';
 import { Button } from '../button/button';
 
 export const Pagination: React.FC<IPaginationProps> = ({
@@ -36,7 +36,7 @@ export const Pagination: React.FC<IPaginationProps> = ({
   };
 
   return (
-    <div className="pagination">
+    <div className={styles.pagination}>
       <nav>
         <Button
           onClick={handlePrevious}

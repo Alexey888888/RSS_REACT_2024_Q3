@@ -4,7 +4,7 @@ import { Input } from '../input/input';
 import { ISearchBarProps } from './ISearchBar';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 
-import './searchBar.scss';
+import styles from './searchBar.module.scss';
 
 export const SearchBar: React.FC<ISearchBarProps> = ({ term, handleSubmit }) => {
   const [searchTerm, setSearchTerm, updateLocalStorage] = useLocalStorage({
@@ -24,7 +24,7 @@ export const SearchBar: React.FC<ISearchBarProps> = ({ term, handleSubmit }) => 
   };
 
   return (
-    <div className="search-bar">
+    <div className={styles.searchBar}>
       <h2>Search for a Star Trek books</h2>
       <form onSubmit={onSubmit}>
         <Input type="text" value={searchTerm} onChange={handleInputChange} />

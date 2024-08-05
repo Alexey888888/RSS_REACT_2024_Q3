@@ -14,16 +14,29 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(bookApi.middleware),
 });
 
-store.subscribe(() => {
-  localStorage.setItem(
-    'selectedItems_888888',
-    JSON.stringify(store.getState().selectedItems.selectedItems),
-  );
-});
+if (typeof window !== 'undefined') {
+  const savedSelectedItems = localStorage.getItem('selectedItems_888888');
+  if (savedSelectedItems) {
+    store.dispatch({
+      type: 'selectedItems/load',
+      payload: JSON.parse(savedSelectedItems),
+    });
+  }
+
+  store.subscribe(() => {
+    localStorage.setItem(
+      'selectedItems_888888',
+      JSON.stringify(store.getState().selectedItems.selectedItems),
+    );
+  });
+}
 
 export const loadSelectedItems = () => {
-  const savedSelectedItems = localStorage.getItem('selectedItems_888888');
-  return savedSelectedItems ? JSON.parse(savedSelectedItems) : [];
+  if (typeof window !== 'undefined') {
+    const savedSelectedItems = localStorage.getItem('selectedItems_888888');
+    return savedSelectedItems ? JSON.parse(savedSelectedItems) : [];
+  }
+  return [];
 };
 
 export type RootState = ReturnType<typeof store.getState>;

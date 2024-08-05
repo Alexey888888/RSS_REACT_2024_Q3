@@ -1,3 +1,10 @@
+.container {
+  min-height: 100vh;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
 .container_light {
   background: #7dc9e4;
 }
@@ -6,7 +13,7 @@
   background: #333333;
 }
 
-.main-page {
+.mainPage {
   .header {
     display: flex;
     align-items: center;

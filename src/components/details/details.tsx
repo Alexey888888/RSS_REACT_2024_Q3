@@ -1,17 +1,16 @@
-import { useParams, useOutletContext } from 'react-router-dom';
+import React from 'react';
 import { Button } from '../../components/button/button';
-
-import './details.scss';
 import { useFetchBookDetailsQuery } from '../../controllers/starTrekApi';
 
+import styles from './details.module.scss';
+
 interface DetailsProps {
+  bookUid: string;
   handleCloseDetails: () => void;
 }
 
-export const Details: React.FC = () => {
-  const { bookUid } = useParams<{ bookUid: string }>();
-  const { data: bookDetails, error, isLoading } = useFetchBookDetailsQuery(bookUid!);
-  const { handleCloseDetails } = useOutletContext<DetailsProps>();
+export const Details: React.FC<DetailsProps> = ({ bookUid, handleCloseDetails }) => {
+  const { data: bookDetails, error, isLoading } = useFetchBookDetailsQuery(bookUid);
 
   if (isLoading) {
     return <p className="loading">Loading...</p>;
@@ -24,7 +23,7 @@ export const Details: React.FC = () => {
   const book = bookDetails?.book;
 
   return (
-    <div className="details" data-testid="details-container">
+    <div className={styles.details} data-testid="details-container">
       <Button type="button" text="Close" onClick={handleCloseDetails} />
       <h3>Title: {book?.title}</h3>
       <ul className="book-detail__list">

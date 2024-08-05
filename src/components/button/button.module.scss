@@ -4,11 +4,11 @@
   cursor: pointer;
 
   &:hover {
-    scale: 1.05;
+    transform: scale(1.05);
   }
 
   &:disabled {
-    scale: 1;
+    transform: scale(1);
     cursor: default;
   }
 }
