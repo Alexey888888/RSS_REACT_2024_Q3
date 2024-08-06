@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { GetServerSideProps } from 'next';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
@@ -43,27 +43,31 @@ const MainPage: React.FC<MainPageProps> = ({
 
   const [selectedBookUid, setSelectedBookUid] = useState<string | null>(null);
 
-  const handleSubmit = async (term: string, page = 1) => {
-    setState({ bookList: [], totalBooks: 0, hasError: false });
-    dispatch(setTerm(term));
-    dispatch(setPage(page));
+  const fetchAndUpdateBooks = useCallback(
+    async (searchTerm: string, page: number) => {
+      setState({ bookList: [], totalBooks: 0, hasError: false });
+      dispatch(setTerm(searchTerm));
+      dispatch(setPage(page));
 
-    const result = await fetchBooks(term, page);
-    setState(result);
-    router.push(`?search=${term}&page=${page}`, undefined, { shallow: true });
-  };
-
-  useEffect(() => {
-    dispatch(setTerm(initialTerm));
-    dispatch(setPage(initialPage));
-  }, [dispatch, initialTerm, initialPage]);
+      const result = await fetchBooks(searchTerm, page);
+      setState(result);
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
-    const { bookUid } = router.query;
-    if (bookUid) {
-      setSelectedBookUid(bookUid as string);
+    const { search, page, details } = router.query;
+    const searchTerm = search || initialTerm;
+    const pageNumber = parseInt(page as string, 10) || initialPage;
+
+    if (details) {
+      setSelectedBookUid(details as string);
+    } else {
+      setSelectedBookUid(null);
     }
-  }, [router.query]);
+
+    fetchAndUpdateBooks(searchTerm as string, pageNumber);
+  }, [router.query, fetchAndUpdateBooks, initialPage, initialTerm]);
 
   const handleBookClick = (bookUid: string) => {
     setSelectedBookUid(bookUid);
@@ -73,13 +77,17 @@ const MainPage: React.FC<MainPageProps> = ({
   };
 
   const handlePageChange = (page: number) => {
-    dispatch(setPage(page));
-    handleSubmit(term, page);
+    router.push(`/?search=${term}&page=${page}`, undefined, { shallow: true });
   };
 
   const handleCloseDetails = () => {
     setSelectedBookUid(null);
     router.push(`/?search=${term}&page=${currentPage}`, undefined, { shallow: true });
+  };
+
+  const handleSubmit = async (term: string) => {
+    await fetchAndUpdateBooks(term, 1);
+    router.push(`/?search=${term}&page=1`, undefined, { shallow: true });
   };
 
   if (state.hasError) return <p>Error!</p>;
