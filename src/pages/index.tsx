@@ -1,21 +1,20 @@
-import React, { useCallback, useEffect } from 'react';
+import React from 'react';
 import { GetServerSideProps } from 'next';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
+import { RootState } from '../redux/store';
+import { setPage, setTerm } from '../redux/slices/paginationSlice';
+import { Details } from '../components/details/details';
 import { SearchBar } from '../components/searchBar/searchBar';
 import { ListView } from '../components/listView/listView';
 import { Pagination } from '../components/pagination/paginationComponent';
-import { RootState } from '../redux/store';
-import { setPage, setTerm } from '../redux/slices/paginationSlice';
-import { setSelectedItemDetails } from '../redux/slices/selectedItemDetailsSlice';
 import IBook, { IMainPageState } from '../interfaces/types';
-import { Flyout } from '../components/flyout/flyout';
-import { ThemeSelector } from '../components/themeSelector/themeSelector';
+import { fetchBooks } from '../controllers/starTrekApi';
 import { useTheme } from '../context/useTheme';
-
 import styles from '../styles/index.module.scss';
 import Head from 'next/head';
-import { fetchBooks } from '../controllers/starTrekApi';
+import { ThemeSelector } from '../components/themeSelector/themeSelector';
+import { Flyout } from '../components/flyout/flyout';
 
 interface MainPageProps {
   initialBooks: IBook[];
@@ -42,32 +41,34 @@ const MainPage: React.FC<MainPageProps> = ({
     hasError: false,
   });
 
-  const handleSubmit = useCallback(
-    async (term: string, page = 1) => {
-      setState({ bookList: [], totalBooks: 0, hasError: false });
-      dispatch(setTerm(term));
-      dispatch(setPage(page));
+  const [selectedBookUid, setSelectedBookUid] = React.useState<string | null>(null);
 
-      const result = await fetchBooks(term, page);
-      setState(result);
-      router.push(`?search=${term}&page=${page}`, undefined, { shallow: true });
-    },
-    [dispatch, router],
-  );
+  const handleSubmit = async (term: string, page = 1) => {
+    setState({ bookList: [], totalBooks: 0, hasError: false });
+    dispatch(setTerm(term));
+    dispatch(setPage(page));
 
-  useEffect(() => {
+    const result = await fetchBooks(term, page);
+    setState(result);
+    router.push(`?search=${term}&page=${page}`, undefined, { shallow: true });
+  };
+
+  React.useEffect(() => {
     dispatch(setTerm(initialTerm));
     dispatch(setPage(initialPage));
   }, [dispatch, initialTerm, initialPage]);
 
   const handleBookClick = (bookUid: string) => {
-    dispatch(setSelectedItemDetails(bookUid));
-    router.push(`/details/${bookUid}?search=${term}&page=${currentPage}`);
+    setSelectedBookUid(bookUid);
   };
 
   const handlePageChange = (page: number) => {
     dispatch(setPage(page));
     handleSubmit(term, page);
+  };
+
+  const handleCloseDetails = () => {
+    setSelectedBookUid(null);
   };
 
   if (state.hasError) return <p>Error!</p>;
@@ -77,30 +78,33 @@ const MainPage: React.FC<MainPageProps> = ({
       <Head>
         <title>Star Trek Main</title>
       </Head>
-      <div>
-        <div
-          className={`container ${theme === 'light' ? styles.container_light : styles.container_dark}`}
-        >
-          <header className={styles.header}>
-            <div className={styles.themeSelector__container}>
-              <ThemeSelector />
+      <div
+        className={`container ${theme === 'light' ? styles.container_light : styles.container_dark}`}
+      >
+        <header className={styles.header}>
+          <div className={styles.themeSelector__container}>
+            <ThemeSelector />
+          </div>
+          <div className={styles.searchBar__container}>
+            <SearchBar handleSubmit={handleSubmit} term={term} />
+          </div>
+        </header>
+        <main className={styles.main__wrapper}>
+          <div className={styles.listView__wrapper}>
+            <ListView bookList={state.bookList} onBookClick={handleBookClick} />
+            <Pagination
+              booksPerPage={15}
+              totalBooks={state.totalBooks}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+          {selectedBookUid && (
+            <div className={styles.details__wrapper}>
+              <Details bookUid={selectedBookUid} handleCloseDetails={handleCloseDetails} />
             </div>
-            <div className={styles.searchBar__container}>
-              <SearchBar handleSubmit={handleSubmit} term={term} />
-            </div>
-          </header>
-          <main className={styles.main__wrapper}>
-            <div>
-              <ListView bookList={state.bookList} onBookClick={handleBookClick} />
-              <Pagination
-                booksPerPage={15}
-                totalBooks={state.totalBooks}
-                currentPage={currentPage}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          </main>
-        </div>
+          )}
+        </main>
         {selectedItems.length > 0 && <Flyout />}
       </div>
     </>

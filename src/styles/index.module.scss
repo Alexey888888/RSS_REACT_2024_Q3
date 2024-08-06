@@ -42,9 +42,13 @@
 
 .main__wrapper {
   display: flex;
-  width: 100%;
+}
 
-  .loading {
-    padding-bottom: 20px;
-  }
+.listView__wrapper {
+  flex: 1;
+}
+
+.details__wrapper {
+  flex: 3;
+  margin-left: 20px;
 }
