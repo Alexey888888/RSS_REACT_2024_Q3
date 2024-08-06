@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { SearchBar } from '../components/searchBar/searchBar';
 import { ListView } from '../components/listView/listView';
-import { Button } from '../components/button/button';
 import { Pagination } from '../components/pagination/paginationComponent';
 import { RootState } from '../redux/store';
 import { setPage, setTerm } from '../redux/slices/paginationSlice';
@@ -61,10 +60,6 @@ const MainPage: React.FC<MainPageProps> = ({
     dispatch(setPage(initialPage));
   }, [dispatch, initialTerm, initialPage]);
 
-  const handleErrorButtonClick = () => {
-    setState((prevState) => ({ ...prevState, hasError: true }));
-  };
-
   const handleBookClick = (bookUid: string) => {
     dispatch(setSelectedItemDetails(bookUid));
     router.push(`/details/${bookUid}?search=${term}&page=${currentPage}`);
@@ -92,9 +87,6 @@ const MainPage: React.FC<MainPageProps> = ({
             </div>
             <div className={styles.searchBar__container}>
               <SearchBar handleSubmit={handleSubmit} term={term} />
-            </div>
-            <div className={styles.errorButton}>
-              <Button type="button" text="Test error" onClick={handleErrorButtonClick} />
             </div>
           </header>
           <main className={styles.main__wrapper}>
