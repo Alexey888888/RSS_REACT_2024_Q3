@@ -26,3 +26,35 @@ export const bookApi = createApi({
 });
 
 export const { useFetchAllBooksQuery, useSearchTermMutation, useFetchBookDetailsQuery } = bookApi;
+
+export const fetchBooks = async (term: string, page: number) => {
+  const apiUrl = 'https://stapi.co/api/v2/rest/book/search';
+  const pageSize = 15;
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `title=${encodeURIComponent(term)}`,
+  };
+
+  try {
+    const response = await fetch(
+      `${apiUrl}?pageNumber=${page - 1}&pageSize=${pageSize}`,
+      term ? requestOptions : undefined,
+    );
+    const data = await response.json();
+    return {
+      bookList: data.books || [],
+      totalBooks: data.page?.totalElements || 0,
+      hasError: false,
+    };
+  } catch (error) {
+    console.error('Error fetching books:', error);
+    return {
+      bookList: [],
+      totalBooks: 0,
+      hasError: true,
+    };
+  }
+};

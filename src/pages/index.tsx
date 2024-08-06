@@ -1,116 +1,65 @@
 import React, { useCallback, useEffect } from 'react';
+import { GetServerSideProps } from 'next';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { SearchBar } from '../components/searchBar/searchBar';
 import { ListView } from '../components/listView/listView';
 import { Button } from '../components/button/button';
 import { Pagination } from '../components/pagination/paginationComponent';
-import { RootState, store } from '../redux/store';
-import { useFetchAllBooksQuery, useSearchTermMutation } from '../controllers/starTrekApi';
+import { RootState } from '../redux/store';
 import { setPage, setTerm } from '../redux/slices/paginationSlice';
 import { setSelectedItemDetails } from '../redux/slices/selectedItemDetailsSlice';
-import { IMainPageState } from '../interfaces/types';
+import IBook, { IMainPageState } from '../interfaces/types';
 import { Flyout } from '../components/flyout/flyout';
 import { ThemeSelector } from '../components/themeSelector/themeSelector';
 import { useTheme } from '../context/useTheme';
-import { Provider } from 'react-redux';
 
 import styles from '../styles/index.module.scss';
 import Head from 'next/head';
+import { fetchBooks } from '../controllers/starTrekApi';
 
-const MainPage: React.FC = () => {
+interface MainPageProps {
+  initialBooks: IBook[];
+  initialTotalBooks: number;
+  initialTerm: string;
+  initialPage: number;
+}
+
+const MainPage: React.FC<MainPageProps> = ({
+  initialBooks,
+  initialTotalBooks,
+  initialTerm,
+  initialPage,
+}) => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const pageSize = 15;
   const { currentPage, term } = useSelector((state: RootState) => state.pagination);
   const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
   const { theme } = useTheme();
 
   const [state, setState] = React.useState<IMainPageState>({
-    bookList: [],
-    totalBooks: 0,
+    bookList: initialBooks,
+    totalBooks: initialTotalBooks,
     hasError: false,
   });
 
-  const {
-    data: allBooks,
-    error: allBooksError,
-    isLoading: allBooksIsLoading,
-  } = useFetchAllBooksQuery({
-    pageNumber: currentPage,
-    pageSize,
-  });
-
-  const [searchTerm, { isLoading: searchTermIsLoading, isError: searchTermIsError }] =
-    useSearchTermMutation();
-
   const handleSubmit = useCallback(
     async (term: string, page = 1) => {
-      setState((prevState) => ({
-        ...prevState,
-        bookList: [],
-        totalBooks: 0,
-      }));
+      setState({ bookList: [], totalBooks: 0, hasError: false });
       dispatch(setTerm(term));
       dispatch(setPage(page));
 
-      if (term) {
-        const searchResult = await searchTerm({ pageNumber: page - 1, pageSize, term });
-        const bookList = searchResult.data?.books;
-        const totalElements = searchResult.data?.page.totalElements;
-
-        if (bookList && totalElements && totalElements > 0) {
-          setState((prevState) => ({
-            ...prevState,
-            bookList,
-            totalBooks: totalElements,
-          }));
-          router.push(`?search=${term}&page=${page}`, undefined, { shallow: true });
-        } else {
-          setState((prevState) => ({
-            ...prevState,
-            bookList: [],
-            totalBooks: 0,
-          }));
-        }
-      } else {
-        router.push(`?search=&page=${page}`, undefined, { shallow: true });
-        dispatch(setTerm(''));
-        if (allBooks) {
-          setState((prevState) => ({
-            ...prevState,
-            bookList: allBooks.books ?? [],
-            totalBooks: allBooks.page.totalElements ?? 0,
-          }));
-        }
-      }
+      const result = await fetchBooks(term, page);
+      setState(result);
+      router.push(`?search=${term}&page=${page}`, undefined, { shallow: true });
     },
-    [allBooks, dispatch, router, searchTerm],
+    [dispatch, router],
   );
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const searchTerm = searchParams.get('search') || '';
-    const page = parseInt(searchParams.get('page') || '1', 10);
-
-    dispatch(setTerm(searchTerm));
-    dispatch(setPage(page));
-
-    const fetchBooks = async () => {
-      if (!searchTerm) {
-        if (allBooks) {
-          setState((prevState) => ({
-            ...prevState,
-            bookList: allBooks.books ?? [],
-            totalBooks: allBooks.page.totalElements ?? 0,
-          }));
-        }
-      } else {
-        await handleSubmit(searchTerm, page);
-      }
-    };
-    fetchBooks();
-  }, [allBooks, dispatch, handleSubmit]);
+    dispatch(setTerm(initialTerm));
+    dispatch(setPage(initialPage));
+  }, [dispatch, initialTerm, initialPage]);
 
   const handleErrorButtonClick = () => {
     setState((prevState) => ({ ...prevState, hasError: true }));
@@ -123,10 +72,10 @@ const MainPage: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     dispatch(setPage(page));
-    router.push(`?search=${term}&page=${page}`, undefined, { shallow: true });
+    handleSubmit(term, page);
   };
 
-  if (state.hasError) throw new Error();
+  if (state.hasError) return <p>Error!</p>;
 
   return (
     <>
@@ -150,20 +99,13 @@ const MainPage: React.FC = () => {
           </header>
           <main className={styles.main__wrapper}>
             <div>
-              {(allBooksIsLoading || searchTermIsLoading) && <p className="loading">Loading...</p>}
-              {(allBooksError || searchTermIsError) && <p>Failed to fetch books.</p>}
-              {!allBooksIsLoading && !allBooksError && !searchTermIsError && (
-                <>
-                  {state.bookList.length === 0 && <p>No books found for this term.</p>}
-                  <ListView bookList={state.bookList} onBookClick={handleBookClick} />
-                  <Pagination
-                    booksPerPage={pageSize}
-                    totalBooks={state.totalBooks}
-                    currentPage={currentPage}
-                    onPageChange={handlePageChange}
-                  />
-                </>
-              )}
+              <ListView bookList={state.bookList} onBookClick={handleBookClick} />
+              <Pagination
+                booksPerPage={15}
+                totalBooks={state.totalBooks}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
             </div>
           </main>
         </div>
@@ -173,10 +115,21 @@ const MainPage: React.FC = () => {
   );
 };
 
-export default function IndexPage() {
-  return (
-    <Provider store={store}>
-      <MainPage />
-    </Provider>
-  );
-}
+export default MainPage;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { query } = context;
+  const searchTerm = query.search || '';
+  const page = parseInt(query.page as string, 10) || 1;
+
+  const result = await fetchBooks(searchTerm as string, page);
+
+  return {
+    props: {
+      initialBooks: result.bookList,
+      initialTotalBooks: result.totalBooks,
+      initialTerm: searchTerm,
+      initialPage: page,
+    },
+  };
+};
