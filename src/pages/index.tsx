@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
@@ -35,13 +35,13 @@ const MainPage: React.FC<MainPageProps> = ({
   const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
   const { theme } = useTheme();
 
-  const [state, setState] = React.useState<IMainPageState>({
+  const [state, setState] = useState<IMainPageState>({
     bookList: initialBooks,
     totalBooks: initialTotalBooks,
     hasError: false,
   });
 
-  const [selectedBookUid, setSelectedBookUid] = React.useState<string | null>(null);
+  const [selectedBookUid, setSelectedBookUid] = useState<string | null>(null);
 
   const handleSubmit = async (term: string, page = 1) => {
     setState({ bookList: [], totalBooks: 0, hasError: false });
@@ -53,13 +53,23 @@ const MainPage: React.FC<MainPageProps> = ({
     router.push(`?search=${term}&page=${page}`, undefined, { shallow: true });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(setTerm(initialTerm));
     dispatch(setPage(initialPage));
   }, [dispatch, initialTerm, initialPage]);
 
+  useEffect(() => {
+    const { bookUid } = router.query;
+    if (bookUid) {
+      setSelectedBookUid(bookUid as string);
+    }
+  }, [router.query]);
+
   const handleBookClick = (bookUid: string) => {
     setSelectedBookUid(bookUid);
+    router.push(`/?search=${term}&page=${currentPage}&details=${bookUid}`, undefined, {
+      shallow: true,
+    });
   };
 
   const handlePageChange = (page: number) => {
@@ -69,6 +79,7 @@ const MainPage: React.FC<MainPageProps> = ({
 
   const handleCloseDetails = () => {
     setSelectedBookUid(null);
+    router.push(`/?search=${term}&page=${currentPage}`, undefined, { shallow: true });
   };
 
   if (state.hasError) return <p>Error!</p>;
