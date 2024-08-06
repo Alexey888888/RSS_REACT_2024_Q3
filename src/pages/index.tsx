@@ -110,13 +110,19 @@ const MainPage: React.FC<MainPageProps> = ({
         </header>
         <main className={styles.main__wrapper}>
           <div className={styles.listView__wrapper}>
-            <ListView bookList={state.bookList} onBookClick={handleBookClick} />
-            <Pagination
-              booksPerPage={15}
-              totalBooks={state.totalBooks}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-            />
+            {state.bookList.length > 0 ? (
+              <>
+                <ListView bookList={state.bookList} onBookClick={handleBookClick} />
+                <Pagination
+                  booksPerPage={15}
+                  totalBooks={state.totalBooks}
+                  currentPage={currentPage}
+                  onPageChange={handlePageChange}
+                />
+              </>
+            ) : (
+              <p>No books found for this term.</p>
+            )}
           </div>
           {selectedBookUid && (
             <div className={styles.details__wrapper}>
