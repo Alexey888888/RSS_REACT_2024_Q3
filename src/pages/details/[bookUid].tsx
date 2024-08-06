@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { store } from '../../redux/store';
 import { ThemeProvider } from '../../context/themeContext';
 import { Details } from '../../components/details/details';
+import Head from 'next/head';
 
 interface DetailsPageProps {
   bookUid: string;
@@ -11,11 +12,16 @@ interface DetailsPageProps {
 
 const DetailsPage: React.FC<DetailsPageProps> = ({ bookUid }) => {
   return (
-    <Provider store={store}>
-      <ThemeProvider>
-        <Details handleCloseDetails={() => {}} bookUid={bookUid} />
-      </ThemeProvider>
-    </Provider>
+    <>
+      <Head>
+        <title>Star Trek Detail</title>
+      </Head>
+      <Provider store={store}>
+        <ThemeProvider>
+          <Details handleCloseDetails={() => {}} bookUid={bookUid} />
+        </ThemeProvider>
+      </Provider>
+    </>
   );
 };
 

@@ -16,6 +16,7 @@ import { useTheme } from '../context/useTheme';
 import { Provider } from 'react-redux';
 
 import styles from '../styles/index.module.scss';
+import Head from 'next/head';
 
 const MainPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -128,42 +129,47 @@ const MainPage: React.FC = () => {
   if (state.hasError) throw new Error();
 
   return (
-    <div className={styles.container}>
-      <div
-        className={`container ${theme === 'light' ? styles.container_light : styles.container_dark}`}
-      >
-        <header className={styles.header}>
-          <div className={styles.themeSelector__container}>
-            <ThemeSelector />
-          </div>
-          <div className={styles.searchBar__container}>
-            <SearchBar handleSubmit={handleSubmit} term={term} />
-          </div>
-          <div className={styles.errorButton}>
-            <Button type="button" text="Test error" onClick={handleErrorButtonClick} />
-          </div>
-        </header>
-        <main className={styles.main__wrapper}>
-          <div>
-            {(allBooksIsLoading || searchTermIsLoading) && <p className="loading">Loading...</p>}
-            {(allBooksError || searchTermIsError) && <p>Failed to fetch books.</p>}
-            {!allBooksIsLoading && !allBooksError && !searchTermIsError && (
-              <>
-                {state.bookList.length === 0 && <p>No books found for this term.</p>}
-                <ListView bookList={state.bookList} onBookClick={handleBookClick} />
-                <Pagination
-                  booksPerPage={pageSize}
-                  totalBooks={state.totalBooks}
-                  currentPage={currentPage}
-                  onPageChange={handlePageChange}
-                />
-              </>
-            )}
-          </div>
-        </main>
+    <>
+      <Head>
+        <title>Star Trek Main</title>
+      </Head>
+      <div className={styles.container}>
+        <div
+          className={`container ${theme === 'light' ? styles.container_light : styles.container_dark}`}
+        >
+          <header className={styles.header}>
+            <div className={styles.themeSelector__container}>
+              <ThemeSelector />
+            </div>
+            <div className={styles.searchBar__container}>
+              <SearchBar handleSubmit={handleSubmit} term={term} />
+            </div>
+            <div className={styles.errorButton}>
+              <Button type="button" text="Test error" onClick={handleErrorButtonClick} />
+            </div>
+          </header>
+          <main className={styles.main__wrapper}>
+            <div>
+              {(allBooksIsLoading || searchTermIsLoading) && <p className="loading">Loading...</p>}
+              {(allBooksError || searchTermIsError) && <p>Failed to fetch books.</p>}
+              {!allBooksIsLoading && !allBooksError && !searchTermIsError && (
+                <>
+                  {state.bookList.length === 0 && <p>No books found for this term.</p>}
+                  <ListView bookList={state.bookList} onBookClick={handleBookClick} />
+                  <Pagination
+                    booksPerPage={pageSize}
+                    totalBooks={state.totalBooks}
+                    currentPage={currentPage}
+                    onPageChange={handlePageChange}
+                  />
+                </>
+              )}
+            </div>
+          </main>
+        </div>
+        {selectedItems.length > 0 && <Flyout />}
       </div>
-      {selectedItems.length > 0 && <Flyout />}
-    </div>
+    </>
   );
 };
 
