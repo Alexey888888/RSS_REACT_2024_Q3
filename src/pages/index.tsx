@@ -128,22 +128,22 @@ const MainPage: React.FC = () => {
   if (state.hasError) throw new Error();
 
   return (
-    <div className={styles.MainPage}>
+    <div className={styles.container}>
       <div
         className={`container ${theme === 'light' ? styles.container_light : styles.container_dark}`}
       >
-        <header className="header">
-          <div className="theme-selector__container">
+        <header className={styles.header}>
+          <div className={styles.themeSelector__container}>
             <ThemeSelector />
           </div>
-          <div className="search-bar__container">
+          <div className={styles.searchBar__container}>
             <SearchBar handleSubmit={handleSubmit} term={term} />
           </div>
-          <div className="error-button">
+          <div className={styles.errorButton}>
             <Button type="button" text="Test error" onClick={handleErrorButtonClick} />
           </div>
         </header>
-        <main className="main__wrapper">
+        <main className={styles.main__wrapper}>
           <div>
             {(allBooksIsLoading || searchTermIsLoading) && <p className="loading">Loading...</p>}
             {(allBooksError || searchTermIsError) && <p>Failed to fetch books.</p>}

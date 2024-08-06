@@ -13,46 +13,44 @@
   background: #333333;
 }
 
-.mainPage {
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
 
-    @media (max-width: 620px) {
-      flex-direction: column-reverse;
-    }
+  @media (max-width: 620px) {
+    flex-direction: column-reverse;
+  }
+}
 
-    .theme-selector__container {
-      padding-left: 30px;
+.themeSelector__container {
+  padding-left: 30px;
 
-      @media (max-width: 980px) {
-        padding-left: 0;
-      }
-
-      @media (max-width: 620px) {
-        padding-top: 20px;
-      }
-    }
-
-    .search-bar__container {
-      flex-grow: 1;
-      display: flex;
-      justify-content: center;
-    }
-
-    .error-button {
-      margin-left: auto;
-    }
+  @media (max-width: 980px) {
+    padding-left: 0;
   }
 
-  .main__wrapper {
-    display: flex;
-    width: 100%;
+  @media (max-width: 620px) {
+    padding-top: 20px;
+  }
 
-    .loading {
-      padding-bottom: 20px;
-    }
+  .searchBar__container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .errorButton {
+    margin-left: auto;
+  }
+}
+
+.main__wrapper {
+  display: flex;
+  width: 100%;
+
+  .loading {
+    padding-bottom: 20px;
   }
 }
