@@ -5,14 +5,14 @@
   align-items: center;
   width: 100%;
   height: 100vh;
+}
 
-  &__title {
-    text-align: center;
-  }
+.notFoundPage__title {
+  text-align: center;
+}
 
-  &__link {
-    &:hover {
-      scale: 1.05;
-    }
+.notFoundPage__link {
+  &:hover {
+    transform: scale(1.05);
   }
 }
