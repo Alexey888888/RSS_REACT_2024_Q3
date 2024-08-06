@@ -1,3 +1,20 @@
 body {
-  background: #6e5ea9ba;
+  transition: background-color 0.3s ease;
+}
+
+body.light-theme {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.dark-theme {
+  background-color: #242424;
+  color: #ffffff;
+}
+
+.container {
+  min-height: 100vh;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
 }

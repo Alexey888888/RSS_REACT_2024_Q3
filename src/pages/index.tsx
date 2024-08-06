@@ -133,7 +133,7 @@ const MainPage: React.FC = () => {
       <Head>
         <title>Star Trek Main</title>
       </Head>
-      <div className={styles.container}>
+      <div>
         <div
           className={`container ${theme === 'light' ? styles.container_light : styles.container_dark}`}
         >
