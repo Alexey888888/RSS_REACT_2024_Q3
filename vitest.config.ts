@@ -9,6 +9,14 @@ export default defineConfig({
     setupFiles: './src/setupTests.ts',
     coverage: {
       provider: 'v8',
+      exclude: [
+        'src/pages/_document.tsx',
+        'vitest.config.ts',
+        'next-env.d.ts',
+        '**/*.js',
+        '**/*.mjs',
+        '**/*.cjs',
+      ],
     },
   },
 });
