@@ -31,3 +31,10 @@ export interface IMainPageState {
   totalBooks: number;
   hasError: boolean;
 }
+
+export interface MainPageProps {
+  initialBooks: IBook[];
+  initialTotalBooks: number;
+  initialTerm: string;
+  initialPage: number;
+}

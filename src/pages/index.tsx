@@ -8,7 +8,7 @@ import { Details } from '../components/details/details';
 import { SearchBar } from '../components/searchBar/searchBar';
 import { ListView } from '../components/listView/listView';
 import { Pagination } from '../components/pagination/paginationComponent';
-import IBook, { IMainPageState } from '../interfaces/types';
+import { IMainPageState, MainPageProps } from '../interfaces/types';
 import { fetchBooks } from '../controllers/starTrekApi';
 import { useTheme } from '../context/useTheme';
 import styles from '../styles/index.module.scss';
@@ -16,14 +16,7 @@ import Head from 'next/head';
 import { ThemeSelector } from '../components/themeSelector/themeSelector';
 import { Flyout } from '../components/flyout/flyout';
 
-interface MainPageProps {
-  initialBooks: IBook[];
-  initialTotalBooks: number;
-  initialTerm: string;
-  initialPage: number;
-}
-
-const MainPage: React.FC<MainPageProps> = ({
+export const MainPage: React.FC<MainPageProps> = ({
   initialBooks,
   initialTotalBooks,
   initialTerm,
