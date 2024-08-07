@@ -12,12 +12,6 @@ vi.mock('next/router', () => ({
     pathname: '/',
     query: {},
     asPath: '/',
-    push: vi.fn(),
-    replace: vi.fn(),
-    reload: vi.fn(),
-    back: vi.fn(),
-    prefetch: vi.fn(),
-    isFallback: false,
   }),
 }));
 
