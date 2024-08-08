@@ -15,6 +15,7 @@ import styles from '../styles/index.module.scss';
 import Head from 'next/head';
 import { ThemeSelector } from '../components/themeSelector/themeSelector';
 import { Flyout } from '../components/flyout/flyout';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 export const MainPage: React.FC<MainPageProps> = ({
   initialBooks,
@@ -24,9 +25,14 @@ export const MainPage: React.FC<MainPageProps> = ({
 }) => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { currentPage, term } = useSelector((state: RootState) => state.pagination);
+  const { currentPage } = useSelector((state: RootState) => state.pagination);
   const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
   const { theme } = useTheme();
+
+  const [searchTerm, setSearchTerm] = useLocalStorage({
+    key: 'searchTerm_888888',
+    initValue: initialTerm,
+  });
 
   const [state, setState] = useState<IMainPageState>({
     bookList: initialBooks,
@@ -38,13 +44,13 @@ export const MainPage: React.FC<MainPageProps> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchAndUpdateBooks = useCallback(
-    async (searchTerm: string, page: number) => {
+    async (term: string, page: number) => {
       setIsLoading(true);
       setState({ bookList: [], totalBooks: 0, hasError: false });
-      dispatch(setTerm(searchTerm));
+      dispatch(setTerm(term));
       dispatch(setPage(page));
 
-      const result = await fetchBooks(searchTerm, page);
+      const result = await fetchBooks(term, page);
       setState(result);
       setIsLoading(false);
     },
@@ -53,7 +59,7 @@ export const MainPage: React.FC<MainPageProps> = ({
 
   useEffect(() => {
     const { search, page, details } = router.query;
-    const searchTerm = search || initialTerm;
+    const currentSearchTerm = search || searchTerm;
     const pageNumber = parseInt(page as string, 10) || initialPage;
 
     if (details) {
@@ -62,26 +68,27 @@ export const MainPage: React.FC<MainPageProps> = ({
       setSelectedBookUid(null);
     }
 
-    fetchAndUpdateBooks(searchTerm as string, pageNumber);
-  }, [router.query, fetchAndUpdateBooks, initialPage, initialTerm]);
+    fetchAndUpdateBooks(currentSearchTerm as string, pageNumber);
+  }, [router.query, fetchAndUpdateBooks, initialPage, searchTerm]);
 
   const handleBookClick = (bookUid: string) => {
     setSelectedBookUid(bookUid);
-    router.push(`/?search=${term}&page=${currentPage}&details=${bookUid}`, undefined, {
+    router.push(`/?search=${searchTerm}&page=${currentPage}&details=${bookUid}`, undefined, {
       shallow: true,
     });
   };
 
   const handlePageChange = (page: number) => {
-    router.push(`/?search=${term}&page=${page}`, undefined, { shallow: true });
+    router.push(`/?search=${searchTerm}&page=${page}`, undefined, { shallow: true });
   };
 
   const handleCloseDetails = () => {
     setSelectedBookUid(null);
-    router.push(`/?search=${term}&page=${currentPage}`, undefined, { shallow: true });
+    router.push(`/?search=${searchTerm}&page=${currentPage}`, undefined, { shallow: true });
   };
 
   const handleSubmit = async (term: string) => {
+    setSearchTerm(term);
     await fetchAndUpdateBooks(term, 1);
     router.push(`/?search=${term}&page=1`, undefined, { shallow: true });
   };
@@ -101,7 +108,7 @@ export const MainPage: React.FC<MainPageProps> = ({
             <ThemeSelector />
           </div>
           <div className={styles.searchBar__container}>
-            <SearchBar handleSubmit={handleSubmit} term={term} />
+            <SearchBar handleSubmit={handleSubmit} term={searchTerm} />
           </div>
         </header>
         <main className={styles.main__wrapper}>
