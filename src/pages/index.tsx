@@ -35,15 +35,18 @@ export const MainPage: React.FC<MainPageProps> = ({
   });
 
   const [selectedBookUid, setSelectedBookUid] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchAndUpdateBooks = useCallback(
     async (searchTerm: string, page: number) => {
+      setIsLoading(true);
       setState({ bookList: [], totalBooks: 0, hasError: false });
       dispatch(setTerm(searchTerm));
       dispatch(setPage(page));
 
       const result = await fetchBooks(searchTerm, page);
       setState(result);
+      setIsLoading(false);
     },
     [dispatch],
   );
@@ -103,7 +106,9 @@ export const MainPage: React.FC<MainPageProps> = ({
         </header>
         <main className={styles.main__wrapper}>
           <div className={styles.listView__wrapper}>
-            {state.bookList.length > 0 ? (
+            {isLoading ? (
+              <p className="loading">Loading...</p>
+            ) : state.bookList.length > 0 ? (
               <>
                 <ListView bookList={state.bookList} onBookClick={handleBookClick} />
                 <Pagination
