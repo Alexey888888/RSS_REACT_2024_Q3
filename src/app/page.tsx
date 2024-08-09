@@ -8,6 +8,7 @@ import { setPage, setTerm } from '../redux/slices/paginationSlice';
 import { fetchBooks } from '../controllers/starTrekApi';
 import Head from 'next/head';
 import { useSearchParams } from 'next/navigation';
+import useTheme from '../context/useTheme';
 
 import styles from '../styles/index.module.scss';
 
@@ -21,6 +22,8 @@ const Flyout = lazy(() => import('../components/flyout/flyout'));
 const Loading = () => <div>Loading...</div>;
 
 function ClientComponent() {
+  const { theme } = useTheme();
+
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,7 +99,9 @@ function ClientComponent() {
       <Head>
         <title>Star Trek Main</title>
       </Head>
-      <div className={styles.container}>
+      <div
+        className={`${styles.container} ${theme === 'light' ? styles.container_light : styles.container_dark}`}
+      >
         <header className={styles.header}>
           <Suspense fallback={<Loading />}>
             <ThemeSelector />
