@@ -9,7 +9,7 @@ interface DetailsProps {
   handleCloseDetails: () => void;
 }
 
-export const Details: React.FC<DetailsProps> = ({ bookUid, handleCloseDetails }) => {
+const Details: React.FC<DetailsProps> = ({ bookUid, handleCloseDetails }) => {
   const { data: bookDetails, error, isLoading } = useFetchBookDetailsQuery(bookUid);
 
   if (isLoading) {
@@ -53,3 +53,5 @@ export const Details: React.FC<DetailsProps> = ({ bookUid, handleCloseDetails })
     </div>
   );
 };
+
+export default Details;

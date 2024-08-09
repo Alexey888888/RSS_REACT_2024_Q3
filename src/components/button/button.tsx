@@ -1,4 +1,4 @@
-import { useTheme } from '../../context/useTheme';
+import useTheme from '../../context/useTheme';
 import { IButtonProps } from './IButton';
 
 import styles from './button.module.scss';

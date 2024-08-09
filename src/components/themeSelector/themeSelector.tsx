@@ -1,7 +1,7 @@
 import React from 'react';
-import { useTheme } from '../../context/useTheme';
+import useTheme from '../../context/useTheme';
 
-export const ThemeSelector: React.FC = () => {
+const ThemeSelector: React.FC = () => {
   const { theme, setTheme } = useTheme();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -18,3 +18,5 @@ export const ThemeSelector: React.FC = () => {
     </div>
   );
 };
+
+export default ThemeSelector;

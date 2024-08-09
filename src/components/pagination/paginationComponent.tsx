@@ -4,7 +4,7 @@ import { IPaginationProps } from './IPagination';
 import styles from './pagination.module.scss';
 import { Button } from '../button/button';
 
-export const Pagination: React.FC<IPaginationProps> = ({
+const Pagination: React.FC<IPaginationProps> = ({
   booksPerPage,
   totalBooks,
   currentPage,
@@ -57,3 +57,5 @@ export const Pagination: React.FC<IPaginationProps> = ({
     </div>
   );
 };
+
+export default Pagination;

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { addItem, removeItem } from '../../redux/slices/selectedItemsSlice';
 
-export const ListView: React.FC<IListView> = ({ bookList, onBookClick }) => {
+const ListView: React.FC<IListView> = ({ bookList, onBookClick }) => {
   const dispatch = useDispatch();
   const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
 
@@ -54,3 +54,5 @@ export const ListView: React.FC<IListView> = ({ bookList, onBookClick }) => {
     </div>
   );
 };
+
+export default ListView;
