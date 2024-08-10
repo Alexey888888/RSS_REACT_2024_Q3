@@ -1,15 +1,11 @@
+'use client';
+
 import React from 'react';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
 import { ThemeProvider } from '../context/themeContext';
 
-export function LayoutWrapper({ children }: { children: React.ReactNode }) {
-  return (
-    <Provider store={store}>
-      <ThemeProvider>{children}</ThemeProvider>
-    </Provider>
-  );
-}
+import '../../node_modules/modern-normalize/modern-normalize.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,7 +16,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png" />
       </head>
       <body>
-        <LayoutWrapper>{children}</LayoutWrapper>
+        <Provider store={store}>
+          <ThemeProvider>{children}</ThemeProvider>
+        </Provider>
       </body>
     </html>
   );
