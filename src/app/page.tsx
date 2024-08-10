@@ -23,14 +23,13 @@ const Loading = () => <div>Loading...</div>;
 
 function ClientComponent() {
   const { theme } = useTheme();
-
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentPage } = useSelector((state: RootState) => state.pagination);
   const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [state, setState] = useState({
     bookList: [],
     totalBooks: 0,
@@ -60,8 +59,11 @@ function ClientComponent() {
   );
 
   useEffect(() => {
-    const currentSearchTerm = searchParams.get('search') || searchTerm;
+    const localStorageTerm = localStorage.getItem('searchTerm');
+    const currentSearchTerm = searchParams.get('search') || localStorageTerm || '';
     const pageNumber = parseInt(searchParams.get('page') || '1', 10);
+
+    setSearchTerm(currentSearchTerm);
 
     if (searchParams.get('details')) {
       setSelectedBookUid(searchParams.get('details') || null);
@@ -70,7 +72,7 @@ function ClientComponent() {
     }
 
     fetchAndUpdateBooks(currentSearchTerm, pageNumber);
-  }, [searchParams, fetchAndUpdateBooks, searchTerm]);
+  }, [searchParams, fetchAndUpdateBooks]);
 
   const handleBookClick = (bookUid: string) => {
     setSelectedBookUid(bookUid);
@@ -88,11 +90,15 @@ function ClientComponent() {
 
   const handleSubmit = async (term: string) => {
     setSearchTerm(term);
+    localStorage.setItem('searchTerm', term);
     await fetchAndUpdateBooks(term, 1);
     router.push(`?search=${term}&page=1`);
   };
 
   if (state.hasError) return <p>Error!</p>;
+
+  const booksPerPage = 15;
+  const totalPages = Math.ceil(state.totalBooks / booksPerPage);
 
   return (
     <>
@@ -119,14 +125,16 @@ function ClientComponent() {
                 <Suspense fallback={<Loading />}>
                   <ListView bookList={state.bookList} onBookClick={handleBookClick} />
                 </Suspense>
-                <Suspense fallback={<Loading />}>
-                  <Pagination
-                    booksPerPage={15}
-                    totalBooks={state.totalBooks}
-                    currentPage={currentPage}
-                    onPageChange={handlePageChange}
-                  />
-                </Suspense>
+                {state.totalBooks > 0 && totalPages > 1 && (
+                  <Suspense fallback={<Loading />}>
+                    <Pagination
+                      booksPerPage={booksPerPage}
+                      totalBooks={state.totalBooks}
+                      currentPage={currentPage}
+                      onPageChange={handlePageChange}
+                    />
+                  </Suspense>
+                )}
               </>
             ) : (
               <p>No books found for this term.</p>
