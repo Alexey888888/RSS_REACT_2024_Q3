@@ -59,6 +59,11 @@ function ClientComponent() {
   );
 
   useEffect(() => {
+    document.body.style.backgroundColor = theme === 'light' ? '#ffffff' : '#242424';
+    document.body.style.color = theme === 'light' ? '#000000' : '#ffffff';
+  }, [theme]);
+
+  useEffect(() => {
     const localStorageTerm = localStorage.getItem('searchTerm');
     const currentSearchTerm = searchParams.get('search') || localStorageTerm || '';
     const pageNumber = parseInt(searchParams.get('page') || '1', 10);
