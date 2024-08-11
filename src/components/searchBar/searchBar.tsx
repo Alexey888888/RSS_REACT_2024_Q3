@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent } from 'react';
 import { Button } from '../button/button';
 import { Input } from '../input/input';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { ISearchBarProps } from './ISearchBar';
+import { ISearchBarProps } from './IsearchBar';
 
 import styles from './searchBar.module.scss';
 
