@@ -4,7 +4,7 @@ import { Input } from '../input/input';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 import styles from './searchBar.module.scss';
-import { ISearchBarProps } from './ISearchBar';
+import { ISearchBarProps } from './IsearchBar';
 
 const SearchBar: React.FC<ISearchBarProps> = ({ term, handleSubmit }) => {
   const [searchTerm, setSearchTerm, updateLocalStorage] = useLocalStorage({
