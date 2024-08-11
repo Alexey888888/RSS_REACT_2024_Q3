@@ -1,0 +1,22 @@
+.flyout {
+  max-width: 1440px;
+  margin: 0 auto;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #cfcfcf;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  p {
+    margin: 0;
+  }
+}
+
+.flyout_dark {
+  background: #292929;
+  color: #ffffff;
+}

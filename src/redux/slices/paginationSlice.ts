@@ -5,19 +5,10 @@ export interface IPaginationState {
   term: string;
 }
 
-const getInitialState = (): IPaginationState => {
-  const location = window.location;
-  const queryParams = new URLSearchParams(location.search);
-  const pageQueryParam = parseInt(queryParams.get('page') || '1', 10);
-  const searchQueryParam = queryParams.get('search') || '';
-
-  return {
-    currentPage: pageQueryParam,
-    term: searchQueryParam,
-  };
+const initialState: IPaginationState = {
+  currentPage: 1,
+  term: '',
 };
-
-const initialState: IPaginationState = getInitialState();
 
 const paginationSlice = createSlice({
   name: 'pagination',

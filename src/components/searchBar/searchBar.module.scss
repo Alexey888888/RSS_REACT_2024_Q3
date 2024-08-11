@@ -1,0 +1,10 @@
+.searchBar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  form {
+    display: flex;
+    column-gap: 20px;
+  }
+}

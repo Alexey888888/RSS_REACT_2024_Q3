@@ -1,11 +1,11 @@
 import { IBookCardProps } from './IBookCard';
 
-import './bookCard.scss';
+import styles from './bookCard.module.scss';
 
 export const BookCard: React.FC<IBookCardProps> = ({ title, onClick }) => {
   return (
-    <div className="book-card" onClick={onClick}>
-      <div className="book-card__inner">
+    <div className={styles.bookCard} onClick={onClick}>
+      <div className={styles.bookCard__inner}>
         <p>{title}</p>
       </div>
     </div>

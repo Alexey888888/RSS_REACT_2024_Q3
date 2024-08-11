@@ -1,4 +1,4 @@
-import { IBook } from '../pages/mainPage/types';
+import IBook from '../interfaces/types';
 
 export interface IFetchBooks {
   bookList?: IBook[];

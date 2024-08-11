@@ -4,11 +4,11 @@ import { RootState } from '../../redux/store';
 import { setSelectedItems } from '../../redux/slices/selectedItemsSlice';
 import { Button } from '../button/button';
 import { CSVLink } from 'react-csv';
-import { useTheme } from '../../context/useTheme';
+import useTheme from '../../context/useTheme';
 
-import './flyout.scss';
+import styles from './flyout.module.scss';
 
-export const Flyout: React.FC = () => {
+const Flyout: React.FC = () => {
   const dispatch = useDispatch();
   const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
   const { theme } = useTheme();
@@ -28,7 +28,9 @@ export const Flyout: React.FC = () => {
   };
 
   return (
-    <div className={`flyout ${theme === 'light' ? 'flyout_light' : 'flyout_dark'}`}>
+    <div
+      className={`${styles.flyout} ${theme === 'light' ? styles.flyout_light : styles.flyout_dark}`}
+    >
       <p>
         {selectedItems.length === 1
           ? '1 item is selected'
@@ -41,3 +43,5 @@ export const Flyout: React.FC = () => {
     </div>
   );
 };
+
+export default Flyout;

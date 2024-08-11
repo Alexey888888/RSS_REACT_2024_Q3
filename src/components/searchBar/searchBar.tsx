@@ -1,12 +1,12 @@
 import { ChangeEvent, FormEvent } from 'react';
 import { Button } from '../button/button';
 import { Input } from '../input/input';
-import { ISearchBarProps } from './ISearchBar';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 
-import './searchBar.scss';
+import styles from './searchBar.module.scss';
+import { ISearchBarProps } from './IsearchBar';
 
-export const SearchBar: React.FC<ISearchBarProps> = ({ term, handleSubmit }) => {
+const SearchBar: React.FC<ISearchBarProps> = ({ term, handleSubmit }) => {
   const [searchTerm, setSearchTerm, updateLocalStorage] = useLocalStorage({
     key: 'searchTerm_888888',
     initValue: term,
@@ -24,7 +24,7 @@ export const SearchBar: React.FC<ISearchBarProps> = ({ term, handleSubmit }) => 
   };
 
   return (
-    <div className="search-bar">
+    <div className={styles.searchBar}>
       <h2>Search for a Star Trek books</h2>
       <form onSubmit={onSubmit}>
         <Input type="text" value={searchTerm} onChange={handleInputChange} />
@@ -33,3 +33,5 @@ export const SearchBar: React.FC<ISearchBarProps> = ({ term, handleSubmit }) => 
     </div>
   );
 };
+
+export default SearchBar;

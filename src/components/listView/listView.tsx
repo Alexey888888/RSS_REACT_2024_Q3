@@ -1,12 +1,13 @@
 import { IListView } from './IListView';
 import { BookCard } from '../bookCard/bookCard';
 
-import './listView.scss';
+import styles from './listView.module.scss';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { addItem, removeItem } from '../../redux/slices/selectedItemsSlice';
 
-export const ListView: React.FC<IListView> = ({ bookList, onBookClick }) => {
+const ListView: React.FC<IListView> = ({ bookList, onBookClick }) => {
   const dispatch = useDispatch();
   const selectedItems = useSelector((state: RootState) => state.selectedItems.selectedItems);
 
@@ -28,7 +29,7 @@ export const ListView: React.FC<IListView> = ({ bookList, onBookClick }) => {
 
   return (
     <div>
-      <ul className="book-list">
+      <ul className={styles.bookList}>
         {bookList.map((book) => (
           <li key={book.uid}>
             <input
@@ -53,3 +54,5 @@ export const ListView: React.FC<IListView> = ({ bookList, onBookClick }) => {
     </div>
   );
 };
+
+export default ListView;
